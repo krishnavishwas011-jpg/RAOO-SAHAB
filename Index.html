@@ -2,1383 +2,624 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RAO SAHAB V.52 PRO (MATH)</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Rajdhani:wght@700;800;900&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WinGo AI Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
     <style>
-        /* --- SECURITY LOCK STYLES --- */
-        #securityScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000 url('https://i.pinimg.com/736x/2a/3b/93/2a3b935756776776c576576576.jpg') center/cover; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .glass-panel { background: rgba(0, 0, 0, 0.9); border: 2px solid #00ff41; padding: 25px; border-radius: 15px; width: 100%; max-width: 350px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.3); backdrop-filter: blur(10px); }
-        .lock-icon { font-size: 50px; color: #00ff41; margin-bottom: 15px; animation: pulse 2s infinite; }
-        .device-id-box { background: #222; border: 1px dashed #555; padding: 10px; margin: 15px 0; color: #fff; font-family: monospace; letter-spacing: 2px; font-size: 18px; cursor: pointer; user-select: all; word-break: break-all; }
-        .inp-license { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: #00ff41; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 15px; border-radius: 5px; outline: none; text-transform: uppercase; }
-        .btn-unlock { background: #00ff41; color: #000; border: none; padding: 12px; width: 100%; font-weight: 900; font-size: 16px; cursor: pointer; border-radius: 5px; font-family: 'Rajdhani'; text-transform: uppercase; }
-        
-        /* MAIN STYLES */
-        :root { --theme-color: #00ff41; --black: #000000; --red: #ff0055; --gold: #FFD700; --purple: #bf00ff; --neon-blue: #00f3ff; --card-bg: rgba(20, 20, 20, 0.85); --emergency: #ff3300; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-weight: bold !important; }
-        body { background: linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.98)), url('https://i.pinimg.com/736x/2a/3b/93/2a3b935756776776c576576576.jpg'); background-size: cover; background-position: center; background-attachment: fixed; font-family: 'Courier Prime', monospace; color: var(--theme-color); width: 100%; min-height: 100vh; overflow-x: hidden; padding-bottom: 100px; display: flex; flex-direction: column; transition: 0.5s; padding-top: 25px; }
-
-        /* --- TICKER --- */
-        .ticker-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 25px; background: #000; overflow: hidden; white-space: nowrap; z-index: 10002; border-bottom: 1px solid #333; display: flex; align-items: center; }
-        .ticker { display: inline-block; animation: marquee 20s linear infinite; padding-left: 100%; font-family: 'Rajdhani'; font-size: 11px; color: #fff; }
-        .ticker-item { display: inline-block; padding: 0 20px; }
-        .win-amt { color: var(--gold); }
-        @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-
-        /* --- COMPONENTS --- */
-        .pro-card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 30px rgba(0,0,0,0.5); border-radius: 12px; }
-        .target-container { width: 100%; background: #111; height: 6px; border-radius: 3px; margin-top: 5px; position: relative; overflow: hidden; border: 1px solid #333; }
-        .target-fill { height: 100%; background: linear-gradient(90deg, var(--theme-color), var(--neon-blue)); width: 0%; transition: width 0.5s; box-shadow: 0 0 10px var(--theme-color); }
-
-        .pattern-row { display: flex; gap: 5px; justify-content: center; padding: 8px; background: #000; border-radius: 20px; border: 1px solid #333; margin: 10px 0; overflow: hidden; height: 30px; align-items: center; }
-        .pattern-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 3px rgba(0,0,0,0.5); }
-        .dot-b { background: var(--theme-color); box-shadow: 0 0 5px var(--theme-color); }
-        .dot-s { background: var(--red); box-shadow: 0 0 5px var(--red); }
-
-        /* CALCULATOR MODAL */
-        #calcModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #111; border: 1px solid var(--theme-color); padding: 20px; border-radius: 10px; width: 100%; max-width: 350px; text-align: center; }
-        .calc-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #333; color: #fff; font-size: 13px; }
-        .btn-calc { background: var(--purple); color: #fff; width: 100%; border: none; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: 'Rajdhani'; cursor: pointer; font-size: 14px; box-shadow: 0 0 10px rgba(191,0,255,0.3); }
-
-        /* DECORATIONS */
-        .garland { position: fixed; top: 25px; left: 0; width: 100%; height: 60px; background-image: url('https://png.pngtree.com/png-clipart/20230913/ourmid/pngtree-marigold-flower-garland-festival-decoration-png-image_10026362.png'); background-repeat: repeat-x; background-size: contain; z-index: 100000; pointer-events: none; }
-        .rgb-border { position: fixed; z-index: 9999; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; border: 4px solid transparent; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); display: none; }
-        .rgb-border.active { display: block; }
-        .rgb-border::before { content: ''; position: absolute; top: -4px; bottom: -4px; left: -4px; right: -4px; background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000); z-index: -1; animation: rgbRunning 3s linear infinite; mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; padding: 4px; }
-        @keyframes rgbRunning { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-
-        /* ANIMATIONS */
-        .disco-active body { animation: discoBg 0.5s infinite alternate; }
-        .hard-disco-active body { animation: hardDisco 0.15s infinite; }
-        @keyframes hardDisco { 0% { background-color: #ff0000; } 33% { background-color: #00ff00; } 66% { background-color: #0000ff; } 100% { background-color: #000; } }
-        .disco-active .divine-header, .disco-active .pred-card { animation: discoBorder 0.3s infinite alternate; }
-        @keyframes discoBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(90deg); } }
-        @keyframes discoBorder { 0% { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; } 50% { border-color: #00ff00; box-shadow: 0 0 20px #00ff00; } 100% { border-color: #0000ff; box-shadow: 0 0 20px #0000ff; } }
-
-        /* HEADER */
-        .fixed-header { width: 100%; background: #000; border-bottom: 2px solid var(--gold); padding: 10px 15px; position: fixed; top: 25px; left: 0; z-index: 10001; margin-top: 0; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3); }
-        .profile-section { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--theme-color); background-color: #000; background-size: cover; background-position: center; box-shadow: 0 0 10px var(--theme-color); }
-        .user-text { display: flex; flex-direction: column; text-align: left; }
-        .user-name { font-size: 14px; color: #fff; font-family: 'Rajdhani'; line-height: 1; text-shadow: 0 0 5px var(--theme-color); margin-bottom: 2px; }
-        .user-status { font-size: 10px; color: #fff; font-family: 'Rajdhani'; display: flex; align-items: center; gap: 4px; }
-        .live-badge { background: var(--red); color: #fff; padding: 1px 4px; border-radius: 3px; font-size: 8px; animation: pulse 1s infinite; margin-right: 3px; }
-        .fixed-title { font-family: 'Rajdhani'; font-size: 16px; font-weight: 900; background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #bf00ff); -webkit-background-clip: text; background-clip: text; color: transparent; text-transform: uppercase; letter-spacing: 1px; text-align: right; line-height: 1.1; }
-
-        .divine-header { margin-top: 80px; position: relative; display: flex; flex-direction: column; align-items: center; padding: 15px; border-bottom: 2px solid var(--purple); background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
-        .krishna-container { position: relative; width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; }
-        .divine-aura { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(191,0,255,0.4) 60%, transparent 100%); animation: auraPulse 2s infinite alternate; z-index: 1; box-shadow: 0 0 40px var(--gold); }
-        @keyframes auraPulse { 0% { transform: scale(0.9); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
-        .krishna-img { width: 100%; height: 100%; object-fit: cover; z-index: 2; border-radius: 50%; border: 3px solid var(--gold); background: #000; overflow: hidden; }
-        .krishna-img img { width: 100%; height: 100%; object-fit: cover; }
-        .hindi-text { font-family: 'Tiro Devanagari Hindi', serif; color: var(--gold); font-size: 32px; text-shadow: 0 0 10px var(--red); margin-top: 10px; z-index: 2; font-weight: bold; }
-        .jhalar { position: absolute; bottom: -5px; left: 20px; font-size: 24px; color: var(--red); animation: swing 2s ease-in-out infinite; z-index: 4; }
-        @keyframes swing { 0% { transform: rotate(5deg); } 50% { transform: rotate(-5deg); } 100% { transform: rotate(5deg); } }
-
-        .flower-rain-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3000; overflow: hidden; display: none; }
-        .flower { position: absolute; top: -50px; font-size: 20px; animation: fall linear infinite; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
-
-        .container { width: 100%; padding: 10px; position: relative; z-index: 2; display: block; flex: 1; }
-
-        .stats-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .stat-box { flex: 1; background: linear-gradient(180deg, #111, #000); border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; }
-        .stat-box.profit { border-color: var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.2); width: 100%; }
-        .stat-val { font-family: 'Rajdhani'; font-size: 20px; color: #fff; display: block;}
-        .stat-label { font-size: 10px; color: #aaa; }
-
-        .trend-row { display: flex; gap: 12px; margin-bottom: 15px; height: 70px; }
-        .trend-box { flex: 1; background: rgba(0,0,0,0.8); border: 1px solid #333; border-radius: 10px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
-        .win-graph-box { border: 1px solid var(--theme-color); }
-        .loss-graph-box { border: 1px solid var(--red); }
-        .trend-label { position: absolute; top: 3px; left: 5px; font-size: 10px; font-family: 'Rajdhani'; z-index: 2; background:rgba(0,0,0,0.5); padding:2px; border-radius:3px; }
-        .svg-line { width: 100%; height: 100%; }
-        .path-win { fill: none; stroke: var(--theme-color); stroke-width: 2; filter: drop-shadow(0 0 5px var(--theme-color)); }
-        .path-loss { fill: none; stroke: var(--red); stroke-width: 2; filter: drop-shadow(0 0 5px var(--red)); }
-
-        .slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 10px 0; margin-bottom: 15px; width: 100%; }
-        .slide-card { min-width: 130px; height: 90px; scroll-snap-align: center; border-radius: 12px; border: 1px solid #333; position: relative; overflow: hidden; background: #111; flex-shrink: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: transform 0.2s; cursor: pointer; }
-        .slide-card:active { transform: scale(0.95); border-color: var(--gold); }
-        .slide-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.85); color: #fff; padding: 4px; font-family: 'Rajdhani'; font-size: 11px; font-weight: bold; text-align: center; border-top: 1px solid var(--theme-color); }
-
-        .main-info-area { display: flex; gap: 10px; height: 180px; margin-bottom: 15px; }
-        .big-image-box { flex: 1; border: 1px solid var(--purple); border-radius: 10px; overflow: hidden; background: #000; position: relative; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 10px rgba(191, 0, 255, 0.3); }
-        .big-image-box img { width: 100%; height: 100%; object-fit: contain; }
-        .scanning-line { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--purple); box-shadow: 0 0 10px var(--purple); animation: scan 2s linear infinite; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        
-        .meters-col { flex: 1.2; display: flex; flex-direction: column; justify-content: space-between; padding: 5px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 1px solid #333; }
-        .meter-box { text-align: center; position: relative; width: 100%; display:flex; align-items:center; gap: 10px; height: 33%; border-bottom: 1px dashed #333; }
-        .meter-box:last-child { border-bottom: none; }
-        .meter-svg { width: 50px; height: 50px; transform: rotate(-90deg); }
-        .meter-circle-bg { fill: none; stroke: #222; stroke-width: 5; }
-        .meter-circle-val { fill: none; stroke: var(--theme-color); stroke-width: 5; stroke-dasharray: 126; stroke-dashoffset: 126; transition: 1s ease; }
-        .meter-text { position: absolute; left: 16px; top: 18px; font-size: 10px; font-family: 'Rajdhani'; color: #fff; }
-        .meter-details { text-align: left; }
-        .meter-label { font-size: 10px; color:#aaa; font-weight: bold; }
-        .meter-sub { font-size: 14px; color: #fff; font-family: 'Rajdhani'; }
-
-        .balls-grid-container { background: #000; padding: 15px; border-radius: 15px; border: 1px solid #333; margin-bottom: 15px; position: relative; overflow: hidden; }
-        .balls-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px; }
-        .ball-item { aspect-ratio: 1; border-radius: 50%; border: 2px solid #444; display: flex; justify-content: center; align-items: center; font-family: 'Rajdhani'; font-size: 18px; color: #666; position: relative; z-index: 2; transition: 0.3s; background: #111; }
-        .ball-item.active { border-color: #fff; color: #fff; text-shadow: 0 0 5px #fff; transform: scale(1.1); }
-        .ball-bg-glow { position: absolute; width: 100%; height: 100%; top: 0; left: 0; border-radius: 50%; z-index: 1; opacity: 0; transition: 0.3s; }
-        .ball-item.cold-active { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
-
-        .number-graph-box { height: 100px; background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 10px; margin-bottom: 15px; position: relative; display: flex; align-items: flex-end; justify-content: space-around; padding: 5px; overflow: hidden; }
-        .num-bar-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 8%; }
-        .num-bar { width: 100%; background: linear-gradient(to top, #222, var(--purple)); border-radius: 3px 3px 0 0; position: relative; transition: height 0.5s; min-height: 5%; border-top: 2px solid #fff; }
-        .num-bar.hot { background: linear-gradient(to top, #006400, var(--theme-color)); box-shadow: 0 0 15px var(--theme-color); }
-        .num-bar-label { font-size: 10px; color: #aaa; margin-top: 2px; }
-        .num-bar-val { font-size: 9px; color: #fff; margin-bottom: 2px; font-weight: bold; }
-
-        /* PREDICTION */
-        .pred-card { border: 1px solid var(--theme-color); padding: 20px; text-align: center; border-radius: 15px; margin: 15px 0; background: var(--card-bg); position: relative; box-shadow: inset 0 0 20px rgba(0,255,65,0.1); width: 100%; backdrop-filter: blur(5px); z-index: 10; }
-        .timer-badge { font-size: 40px; font-weight: 900; color: var(--theme-color); text-shadow: 0 0 10px var(--theme-color); font-family: 'Rajdhani'; letter-spacing: 2px; }
-        .result-display { font-size: 48px; font-weight: 900; margin: 10px 0; font-family: 'Rajdhani'; letter-spacing: 2px; }
-        .big { color: var(--theme-color); text-shadow: 0 0 15px var(--theme-color); }
-        .small { color: var(--red); text-shadow: 0 0 15px var(--red); }
-        .skip { color: var(--gold); font-size: 30px; animation: pulse 1s infinite; border: 2px dashed var(--gold); padding: 5px; border-radius: 10px; }
-        .ai-glow { animation: neonPulse 0.8s infinite alternate; }
-        @keyframes neonPulse { from { box-shadow: 0 0 5px var(--theme-color); transform: scale(1); } to { box-shadow: 0 0 25px var(--theme-color), 0 0 5px #fff; transform: scale(1.05); } }
-
-        /* GAME FRAME */
-        .game-frame-container { width: 100%; height: 85vh; display: flex; flex-direction: column; position: relative; }
-        iframe { width: 100%; height: 100%; border: none; background: #fff; flex: 1; border-radius: 10px; }
-        .ai-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
-        .ai-overlay.active-win { animation: flashGreen 1s infinite; box-shadow: inset 0 0 80px #00ff41; background: rgba(0, 255, 65, 0.15); border: 2px solid #00ff41; }
-        .ai-overlay.active-loss { animation: flashRed 1s infinite; box-shadow: inset 0 0 80px #ff0055; background: rgba(255, 0, 85, 0.15); border: 2px solid #ff0055; }
-        @keyframes flashGreen { 0% { opacity: 0.3; } 50% { opacity: 0.9; } 100% { opacity: 0.3; } }
-        @keyframes flashRed { 0% { opacity: 0.3; } 50% { opacity: 0.9; } 100% { opacity: 0.3; } }
-
-        /* CONTROLS */
-        .btn-hacker { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--theme-color); color: var(--theme-color); padding: 12px; cursor: pointer; font-family: 'Rajdhani'; font-weight: 800; width: 100%; font-size: 16px; border-radius: 5px; margin-bottom: 10px; }
-        .btn-stop { border-color: var(--red); color: var(--red); background: rgba(255, 0, 85, 0.1); }
-        .server-box { border: 1px solid #333; padding: 10px; border-radius: 10px; margin: 10px 0; background: rgba(0,0,0,0.7); width: 100%; position: relative; z-index: 20; }
-        .srv-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 5px; }
-        .sub-srv-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 10px; }
-        .timer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin: 10px 0; }
-        .srv-btn { background: #111; border: 1px solid #333; color: #555; padding: 10px; font-size: 11px; cursor: pointer; font-weight: bold; border-radius: 5px; text-align: center; font-family: 'Rajdhani'; transition: 0.3s; z-index: 30; }
-        .srv-btn.active { background: var(--purple); color: #fff; box-shadow: 0 0 10px var(--purple); animation: pulseBtn 1s infinite; }
-        
-        /* EMERGENCY SERVER STYLES */
-        #emergencyBox { display: none; margin: 15px 0; border: 2px dashed var(--emergency); background: rgba(20,0,0,0.8); padding: 10px; border-radius: 10px; animation: flashEmerg 2s infinite; }
-        .em-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .em-btn { background: #300; border: 1px solid var(--emergency); color: var(--emergency); padding: 15px; font-family: 'Rajdhani'; font-weight: 900; text-align: center; cursor: pointer; border-radius: 5px; position: relative; overflow: hidden; }
-        .em-btn.active { background: var(--emergency); color: #000; box-shadow: 0 0 15px var(--emergency); }
-        .em-acc { font-size: 9px; margin-top: 5px; color: #fff; }
-        @keyframes flashEmerg { 0% { border-color: var(--emergency); } 50% { border-color: #500; } 100% { border-color: var(--emergency); } }
-
-        .timer-btn { background: #111; border: 1px solid #333; color: #555; padding: 10px; font-size: 11px; cursor: pointer; font-weight: bold; border-radius: 5px; text-align: center; font-family: 'Rajdhani'; transition: 0.3s; z-index: 30; }
-        .timer-btn.active { background: var(--theme-color); color: #000; box-shadow: 0 0 10px var(--theme-color); }
-        @keyframes pulseBtn { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        .sub-btn { background: #000; border: 1px solid #333; color: #666; padding: 8px; font-size: 10px; cursor: pointer; }
-        .sub-btn.active { border-color: var(--theme-color); color: var(--theme-color); }
-        .srv-status { text-align: center; color: var(--theme-color); font-size: 10px; margin-top: 5px; display: none; }
-
-        .cfg-panel { border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.8); width: 100%; }
-        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; border-bottom: 1px solid #111; padding-bottom: 8px; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; border: 1px solid #444; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: #888; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: rgba(255,255,255,0.2); border-color: var(--theme-color); }
-        input:checked + .slider:before { transform: translateX(18px); background-color: var(--theme-color); }
-        .inp-mini { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; font-size: 12px; margin-bottom: 10px; display: none; font-family: 'Courier Prime'; }
-        
-        .inp-key { width: 100%; padding: 12px; margin: 15px 0; background: #111; border: 1px solid #333; color: var(--theme-color); text-align: center; font-family: 'Courier Prime'; font-weight: bold; font-size: 16px; outline: none; border-radius: 5px; }
-
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
-        .nav-item { color: #444; text-align: center; cursor: pointer; transition: 0.3s; flex: 1; }
-        .nav-item.active { color: var(--theme-color); text-shadow: 0 0 10px var(--theme-color); transform: translateY(-3px); }
-        .tab-content { display: none; width: 100%; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* SCREENS & POPUPS */
-        #resultPopup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 20000; justify-content: center; align-items: center; flex-direction: column; animation: zoomIn 0.3s ease; }
-        .popup-box { background: #000; border: 2px solid #fff; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 0 50px rgba(0,255,65,0.5); transform: scale(1.2); }
-        .popup-title { font-family: 'Rajdhani'; font-size: 60px; font-weight: 900; margin-bottom: 10px; }
-        .popup-num { font-size: 40px; color: #fff; font-weight: bold; }
-        .win-mode .popup-box { border-color: var(--theme-color); box-shadow: 0 0 50px var(--theme-color); }
-        .win-mode .popup-title { color: var(--theme-color); text-shadow: 0 0 20px var(--theme-color); }
-        .loss-mode .popup-box { border-color: var(--red); box-shadow: 0 0 50px var(--red); }
-        .loss-mode .popup-title { color: var(--red); text-shadow: 0 0 20px var(--red); }
-        @keyframes zoomIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* PROFILE CARD */
-        .profile-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: linear-gradient(90deg, rgba(0,0,0,0.8), rgba(20,20,20,0.8)); border: 1px solid var(--theme-color); border-radius: 10px; margin-bottom: 20px; }
-        .profile-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); background-color: #000; background-size: cover; background-position: center; }
-        .profile-info h3 { color: #fff; font-family: 'Rajdhani'; font-size: 20px; margin-bottom: 2px; }
-        .profile-badge { background: var(--gold); color: #000; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; font-family: 'Rajdhani'; }
-
-        #toast { visibility: hidden; min-width: 250px; background-color: #000; color: var(--theme-color); text-align: center; border: 1px solid var(--theme-color); padding: 16px; position: fixed; z-index: 10005; left: 50%; bottom: 100px; transform: translateX(-50%); font-size: 12px; border-radius: 5px; font-weight: bold; }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 4.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 100px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 100px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-        
-        .color-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 10px; justify-items: center; margin-bottom: 10px; }
-        .color-dot { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 2px solid #333; transition: transform 0.2s; }
-        .color-dot:hover { transform: scale(1.1); border-color: #fff; }
-        
-        /* FEED BOX STYLES */
-        #feedBoxUi { display: none; margin-top: 10px; }
-        .stars { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .star { font-size: 25px; color: #333; cursor: pointer; transition: 0.2s; }
-        .star.selected { color: var(--gold); }
-        .inp-feed { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; font-family: 'Courier Prime'; height: 60px; resize: none; }
-        
-        /* NEW STYLES FOR FUND & OWNER & FEED */
-        .fund-box { background: linear-gradient(90deg, #111, #222); border: 2px solid var(--gold); border-radius: 10px; padding: 15px; margin: 15px 0; text-align: center; animation: pulse 2s infinite; }
-        .fund-title { color: #fff; font-size: 12px; font-family: 'Rajdhani'; letter-spacing: 2px; }
-        .fund-amount { font-size: 24px; color: var(--gold); font-weight: 900; font-family: 'Rajdhani'; margin-top: 5px; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
-        
-        .owner-watermark { text-align: center; color: #333; font-family: 'Rajdhani'; font-weight: 900; font-size: 18px; margin: 20px 0 10px 0; letter-spacing: 3px; text-transform: uppercase; }
-
-        /* LIVE FEED STYLES */
-        .live-feed-container { height: 160px; overflow: hidden; background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 10px; margin-bottom: 30px; position: relative; padding: 10px; display: flex; flex-direction: column-reverse; }
-        .feed-title { position: absolute; top: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); color: var(--theme-color); font-size: 10px; text-align: center; padding: 2px; font-family: 'Rajdhani'; z-index: 2; border-bottom: 1px solid #333; }
-        .feed-item { font-family: 'Rajdhani'; font-size: 12px; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 5px; color: #ccc; animation: fadeInFeed 0.5s forwards; }
-        .feed-win { color: #00ff41; font-weight: bold; }
-        .feed-user { color: #FFD700; font-weight: bold; }
-        @keyframes fadeInFeed { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* HIDE APP INITIALLY */
-        #mainApp { display: none; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;min-height:100vh}
+        .page-title{position:fixed;top:15px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:500;color:#b0b0b8;letter-spacing:1.5px;z-index:100}
+        .page-title svg{width:20px;height:20px;fill:none;stroke:#b0b0b8;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+        .game-section{position:fixed;top:55px;left:25px;right:25px;bottom:80px;overflow-y:auto}
+        .long-box{width:100%;height:42px;background:#f5f5f5;border-radius:9999px;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;padding:5px 6px 5px 12px;gap:8px}
+        .star-symbol{font-size:18px;color:#8b5cf6;transition:all .15s ease}
+        .star-symbol.thirty-sec{color:#10b981}
+        .period-number{flex:1;font-size:15px;font-weight:700;color:#333;letter-spacing:.8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .2s ease}
+        .period-number.loading{color:#aaa;font-size:13px}
+        .period-number.updated{animation:flashUpdate .3s ease}
+        @keyframes flashUpdate{0%{opacity:.5;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
+        .timer-display{height:32px;min-width:44px;padding:0 12px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .15s ease;background:rgba(139,92,246,.1);color:#8b5cf6;border:2px solid #8b5cf6;-webkit-tap-highlight-color:transparent}
+        .timer-display:active{transform:scale(.95)}
+        .timer-display.thirty-sec{background:rgba(16,185,129,.1);color:#10b981;border-color:#10b981}
+        .timer-display.fetching{animation:pulse .3s ease-in-out}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+        .prediction-display{margin-top:20px;text-align:center}
+        .prediction-line{display:flex;align-items:center;justify-content:center;gap:10px}
+        .prediction-text{font-family:"Luckiest Guy",cursive;font-size:60px;color:#8B5CF6;text-shadow:0 4px 12px rgba(139,92,246,.4);letter-spacing:2px;text-transform:uppercase;transition:all .2s ease;line-height:1.2}
+        .prediction-text.updated{animation:predPop .4s ease}
+        @keyframes predPop{0%{transform:scale(.7);opacity:.3}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+        .prediction-num{font-family:"Luckiest Guy",cursive;font-size:60px;letter-spacing:2px;transition:all .3s ease;line-height:1.2;text-shadow:0 4px 12px rgba(0,0,0,.15)}
+        .prediction-num.clr-green{color:#10b981;text-shadow:0 4px 12px rgba(16,185,129,.4)}
+        .prediction-num.clr-red{color:#ef4444;text-shadow:0 4px 12px rgba(239,68,68,.4)}
+        .prediction-num.clr-redviolet{background:linear-gradient(135deg,#ef4444,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none;filter:drop-shadow(0 4px 8px rgba(168,85,247,.35))}
+        .prediction-num.clr-greenviolet{background:linear-gradient(135deg,#10b981,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none;filter:drop-shadow(0 4px 8px rgba(168,85,247,.35))}
+        .prediction-num.updated{animation:predPop .45s ease}
+        .prediction-confidence{margin-top:12px;font-size:11px;font-weight:700;color:#b0b0b8;letter-spacing:1.5px;text-transform:uppercase}
+        .gauge-section{margin-top:25px;display:flex;justify-content:space-between;gap:15px;padding:0 10px}
+        .gauge-container{flex:1;display:flex;flex-direction:column;align-items:center}
+        .gauge{position:relative;width:60px;height:60px}
+        .gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+        .gauge-bg{fill:none;stroke:#e8e8e8;stroke-width:7}
+        .gauge-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1s ease-in-out,stroke .5s ease}
+        .gauge-fill.green{stroke:#10b981}.gauge-fill.red{stroke:#ef4444}.gauge-fill.purple{stroke:#8b5cf6}.gauge-fill.gray{stroke:#6b7280}
+        .gauge-glow{position:absolute;top:50%;left:50%;width:35px;height:35px;transform:translate(-50%,-50%);border-radius:50%;opacity:.25;filter:blur(10px);transition:all .5s ease}
+        .gauge-glow.green{background:#10b981}.gauge-glow.red{background:#ef4444}.gauge-glow.purple{background:#8b5cf6}.gauge-glow.gray{background:#6b7280}
+        @keyframes gaugePulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.25}50%{transform:translate(-50%,-50%) scale(1.3);opacity:.4}}
+        .gauge.high .gauge-glow{animation:gaugePulse 2s ease-in-out infinite}
+        .gauge-label{font-size:8px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:.6px;margin-top:5px}
+        .info-panel{margin-top:25px;display:flex;flex-direction:column;gap:12px}
+        .info-row{display:flex;justify-content:space-between;gap:12px}
+        .info-box{flex:1;min-height:70px;border-radius:18px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.04);transition:transform .2s ease;border:1px solid rgba(0,0,0,.05)}
+        .info-box:active{transform:scale(.98)}
+        .info-label{font-size:18px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+        .info-value{font-size:24px;font-weight:900}
+        .pass-box{background:linear-gradient(95deg,rgba(16,185,129,.25) 0%,#fff 85%)}.pass-box .info-label{color:#0a5e3c}.pass-box .info-value{color:#10b981}
+        .fail-box{background:linear-gradient(95deg,rgba(239,68,68,.2) 0%,#fff 85%)}.fail-box .info-label{color:#a13131}.fail-box .info-value{color:#ef4444}
+        .accuracy-box{background:linear-gradient(95deg,#d1d5db 0%,#fff 85%)}.accuracy-box .info-label{color:#1e293b}.accuracy-box .info-value{color:#0f172a;font-weight:900}
+        .bets-box{background:linear-gradient(95deg,rgba(168,85,247,.25) 0%,#fff 85%)}.bets-box .info-label{color:#6b21a8}.bets-box .info-value{color:#a855f7}
+        .home-credit{text-align:center;font-size:13px;font-weight:600;color:#888;letter-spacing:1px;text-transform:uppercase;margin-top:20px;margin-bottom:10px}
+        .home-credit span{color:#8B5CF6;font-weight:700}
+        .history-container{position:fixed;top:55px;left:15px;right:15px;bottom:80px;overflow-y:auto;padding:10px}
+        .history-header{display:flex;flex-direction:column;gap:12px;margin-bottom:15px}
+        .header-top{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+        .history-title{font-size:16px;font-weight:700;color:#333}
+        .win-loss-badge{display:flex;gap:15px;background:#f0f0f5;padding:6px 18px;border-radius:40px;font-size:14px;font-weight:700}
+        .win-badge{color:#10b981}.lose-badge{color:#ef4444}
+        .filter-toggle{display:flex;background:#f0f0f0;border-radius:40px;padding:4px;width:fit-content;border:1px solid #ddd;gap:2px}
+        .filter-option{padding:8px 24px;font-size:14px;font-weight:700;border-radius:40px;cursor:pointer;transition:all .2s;color:#555;text-transform:uppercase;letter-spacing:.5px;user-select:none;white-space:nowrap}
+        .filter-option.active{background:#007aff;color:#fff;box-shadow:0 2px 8px rgba(0,122,255,.2)}
+        .filter-option.win-btn.active{background:#ffb347;color:#000}
+        .filter-option.win-btn:not(.active){background:#ffe68f;color:#5a3e0b}
+        .filter-option:active{transform:scale(.94)}
+        .filter-option.win-btn{position:relative}
+        .filter-option.win-btn::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:rgba(0,0,0,.2);border-radius:2px;opacity:0;transition:opacity .2s}
+        .filter-option.win-btn.long-press-hint::after{opacity:1}
+        .history-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+        .history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;background:#f8f8f8;border-radius:12px;border:1px solid #eee}
+        .history-item.win{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.05));border-color:rgba(16,185,129,.3)}
+        .history-item.lose{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.05));border-color:rgba(239,68,68,.3)}
+        .history-left{display:flex;flex-direction:column;gap:3px}
+        .history-period{font-size:11px;color:#888;font-weight:500}
+        .history-prediction{font-size:14px;font-weight:700;color:#333}
+        .history-right{display:flex;align-items:center;gap:10px}
+        .history-result{font-size:13px;font-weight:600;color:#666}
+        .history-status{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+        .history-status.win{background:#10b981;color:#fff}
+        .history-status.lose{background:#ef4444;color:#fff}
+        .no-history{text-align:center;padding:40px 20px;color:#aaa;font-size:14px}
+        .nav-wrapper{position:fixed;bottom:12px;left:28px;right:28px;z-index:1000}
+        .bottom-nav{display:flex;justify-content:space-around;align-items:center;padding:3px;background:rgba(255,255,255,.35);backdrop-filter:blur(25px) saturate(160%);-webkit-backdrop-filter:blur(25px) saturate(160%);border-radius:9999px;border:1px solid rgba(255,255,255,.25);box-shadow:0 4px 24px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.03);position:relative;overflow:hidden}
+        .ripple-container{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden;border-radius:9999px}
+        .water-ripple{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(0,122,255,.15) 0%,rgba(0,122,255,.05) 40%,transparent 70%);transform:scale(0);animation:wripple .8s ease-out forwards}
+        @keyframes wripple{to{transform:scale(4);opacity:0}}
+        .bubble{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.6),rgba(0,122,255,.08));pointer-events:none;opacity:0}
+        .bubble.pop{animation:bubblePop .9s ease-out forwards}
+        @keyframes bubblePop{0%{opacity:.7;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-30px) scale(.2)}}
+        .nav-item{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;padding:4px 8px;position:relative;z-index:10;-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .25s cubic-bezier(.68,-.55,.27,1.55)}
+        .nav-item:active{transform:scale(.82)}
+        .nav-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center;position:relative}
+        .nav-icon svg{width:25px;height:25px;fill:none;stroke:#b0b0b8;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:all .35s ease}
+        .nav-item.active .nav-icon svg{stroke:#007aff;fill:rgba(0,122,255,.1);filter:drop-shadow(0 2px 6px rgba(0,122,255,.3))}
+        .nav-icon::after{content:'';position:absolute;width:35px;height:35px;border-radius:50%;background:radial-gradient(circle,rgba(0,122,255,.12),transparent 70%);opacity:0;transition:opacity .4s,transform .4s;transform:scale(.4)}
+        .nav-item.active .nav-icon::after{opacity:1;transform:scale(1);animation:glow 2.2s ease-in-out infinite}
+        @keyframes glow{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
+        .nav-label{font-size:9px;font-weight:500;color:#b0b0b8;transition:all .35s ease}
+        .nav-item.active .nav-label{color:#007aff;font-weight:600}
+        .active-dot{position:absolute;bottom:-1px;width:4px;height:4px;border-radius:50%;background:#007aff;opacity:0;transition:opacity .3s;box-shadow:0 0 5px rgba(0,122,255,.5)}
+        .nav-item.active .active-dot{opacity:1}
+        .page-content{display:none}.page-content.active{display:block}
+        .telegram-container{position:fixed;top:55px;left:25px;right:25px;bottom:80px;overflow-y:auto;padding:20px 0}
+        .input-group{margin-bottom:20px}
+        .input-label{display:block;font-size:14px;font-weight:600;color:#333;margin-bottom:8px;letter-spacing:0.5px}
+        .telegram-input{width:100%;padding:15px 18px;font-size:15px;border:2px solid #e0e0e0;border-radius:16px;outline:none;transition:all 0.3s ease;background:#f8f8f8}
+        .telegram-input:focus{border-color:#8B5CF6;background:#fff;box-shadow:0 4px 12px rgba(139,92,246,.1)}
+        .telegram-input::placeholder{color:#aaa;font-size:14px}
+        .start-btn{width:100%;padding:18px;background:linear-gradient(135deg,#8B5CF6,#A78BFA);border:none;border-radius:16px;color:white;font-size:18px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.3s ease;box-shadow:0 8px 20px rgba(139,92,246,.3);margin-top:15px;text-transform:uppercase}
+        .start-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(139,92,246,.4)}
+        .start-btn:active{transform:scale(0.98)}
+        .start-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+        .telegram-status{margin-top:20px;padding:15px;border-radius:12px;font-size:14px;font-weight:500;text-align:center;display:none}
+        .telegram-status.success{background:#10b98120;color:#10b981;border:1px solid #10b981;display:block}
+        .telegram-status.error{background:#ef444420;color:#ef4444;border:1px solid #ef4444;display:block}
+        .telegram-status.info{background:#3b82f620;color:#3b82f6;border:1px solid #3b82f6;display:block}
+        .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center;animation:fadeIn .3s ease}
+        .modal-overlay.show{display:flex}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .modal-box{background:#fff;border-radius:24px;padding:30px 25px;width:85%;max-width:340px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.3);animation:modalPop .4s cubic-bezier(.68,-.55,.27,1.55)}
+        @keyframes modalPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+        .modal-icon{font-size:50px;margin-bottom:12px}
+        .modal-title{font-size:20px;font-weight:800;color:#333;margin-bottom:6px;letter-spacing:.5px}
+        .modal-subtitle{font-size:13px;color:#888;margin-bottom:20px;line-height:1.5}
+        .modal-input-group{margin-bottom:20px}
+        .modal-input-label{font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
+        .modal-input{width:100%;padding:14px 18px;font-size:28px;font-weight:800;text-align:center;border:2.5px solid #e0e0e0;border-radius:16px;outline:none;transition:all .3s ease;background:#f8f8fa;color:#8B5CF6;letter-spacing:3px}
+        .modal-input:focus{border-color:#8B5CF6;background:#fff;box-shadow:0 4px 16px rgba(139,92,246,.15)}
+        .modal-input::placeholder{color:#ccc;font-size:16px;font-weight:500;letter-spacing:0}
+        .modal-btn-row{display:flex;gap:10px}
+        .modal-btn{flex:1;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s ease;letter-spacing:.5px}
+        .modal-btn:active{transform:scale(.95)}
+        .modal-btn.cancel{background:#f0f0f0;color:#666}
+        .modal-btn.cancel:hover{background:#e5e5e5}
+        .modal-btn.confirm{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:#fff;box-shadow:0 4px 15px rgba(139,92,246,.3)}
+        .modal-btn.confirm:hover{box-shadow:0 6px 20px rgba(139,92,246,.4)}
+        .win-preset-row{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;justify-content:center}
+        .win-preset{padding:8px 16px;border-radius:12px;background:#f0f0f5;border:2px solid transparent;font-size:14px;font-weight:700;color:#555;cursor:pointer;transition:all .2s ease}
+        .win-preset:hover{border-color:#8B5CF6;color:#8B5CF6}
+        .win-preset.selected{background:#8B5CF620;border-color:#8B5CF6;color:#8B5CF6}
+        .win-preset:active{transform:scale(.93)}
+        .bot-running-card{margin-top:20px;padding:20px;border-radius:18px;background:linear-gradient(135deg,#8B5CF610,#A78BFA10);border:2px solid #8B5CF630;display:none}
+        .bot-running-card.show{display:block}
+        .bot-running-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .bot-running-title{font-size:15px;font-weight:700;color:#8B5CF6;display:flex;align-items:center;gap:8px}
+        .bot-pulse{width:10px;height:10px;border-radius:50%;background:#10b981;animation:botPulse 1.5s ease-in-out infinite}
+        @keyframes botPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+        .bot-stop-btn{padding:6px 14px;border-radius:10px;background:#ef4444;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+        .bot-stop-btn:active{transform:scale(.93)}
+        .bot-stats{display:flex;gap:12px;flex-wrap:wrap}
+        .bot-stat{flex:1;min-width:80px;padding:10px;background:#fff;border-radius:12px;text-align:center}
+        .bot-stat-value{font-size:20px;font-weight:800;color:#333}
+        .bot-stat-label{font-size:10px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+        .bot-stat-value.green{color:#10b981}
+        .bot-stat-value.red{color:#ef4444}
+        .bot-stat-value.purple{color:#8B5CF6}
     </style>
 </head>
-<body id="bodyEl">
-
-    <div class="ticker-wrap">
-        <div class="ticker" id="winnerTicker">
+<body>
+    <div class="page-title" id="pageTitle">
+        <svg viewBox="0 0 24 24" id="pageTitleIcon"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span id="pageTitleText">ʜᴏᴍᴇ</span>
+    </div>
+    <div class="page-content active" id="homePage">
+        <div class="game-section">
+            <div class="long-box">
+                <span class="star-symbol" id="starSymbol">✦</span>
+                <span class="period-number" id="periodNumber">Loading...</span>
+                <div class="timer-display" id="timerDisplay" onclick="toggleGame()">60</div>
             </div>
+            <div class="prediction-display">
+                <div class="prediction-line">
+                    <div class="prediction-text" id="predictionText">BIGG</div>
+                    <div class="prediction-num clr-green" id="predictionNum">7</div>
+                </div>
+                <div class="prediction-confidence" id="predictionConfidence">AI CONFIDENCE: --</div>
+                <div class="gauge-section">
+                    <div class="gauge-container"><div class="gauge" id="gauge1"><div class="gauge-glow green"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill green" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill1"/></svg></div><span class="gauge-label">PASS</span></div>
+                    <div class="gauge-container"><div class="gauge" id="gauge2"><div class="gauge-glow red"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill red" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill2"/></svg></div><span class="gauge-label">FAIL</span></div>
+                    <div class="gauge-container"><div class="gauge" id="gauge3"><div class="gauge-glow gray"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill gray" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill3"/></svg></div><span class="gauge-label">ACCURACY</span></div>
+                    <div class="gauge-container"><div class="gauge" id="gauge4"><div class="gauge-glow purple"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill purple" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill4"/></svg></div><span class="gauge-label">BETS</span></div>
+                </div>
+                <div class="info-panel">
+                    <div class="info-row"><div class="info-box pass-box"><span class="info-label">PASS</span><span class="info-value" id="passCount">0</span></div><div class="info-box fail-box"><span class="info-label">FAIL</span><span class="info-value" id="failCount">0</span></div></div>
+                    <div class="info-row"><div class="info-box accuracy-box"><span class="info-label">ACCURACY</span><span class="info-value" id="accuracyValue">0%</span></div></div>
+                    <div class="info-row"><div class="info-box bets-box"><span class="info-label">BETS</span><span class="info-value" id="betsValue">0</span></div></div>
+                </div>
+                <div class="home-credit">ᴩᴏᴡᴇʀᴅ ʙʏ <span>@ᴀᴋᴇʟᴀʜᴀᴄᴋᴇʀ</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="page-content" id="serverPage"></div>
+    <div class="page-content" id="historyPage">
+        <div class="history-container">
+            <div class="history-header">
+                <div class="header-top"><span class="history-title">Prediction History</span><div class="win-loss-badge"><span class="win-badge" id="winCountDisplay">WIN: 0</span><span class="lose-badge" id="loseCountDisplay">LOSS: 0</span></div></div>
+                <div class="filter-toggle" id="unifiedToggle">
+                    <span class="filter-option active" data-filter="30S" onclick="setGameTypeFilter('30S')">30S</span>
+                    <span class="filter-option" data-filter="1M" onclick="setGameTypeFilter('1M')">1M</span>
+                    <span class="filter-option win-btn" id="winFilterBtn" onclick="toggleWinFilter()" onmousedown="startLongPress()" onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()" ontouchstart="startLongPress()" ontouchend="cancelLongPress()" ontouchcancel="cancelLongPress()">🏆 WIN</span>
+                </div>
+            </div>
+            <div class="history-list" id="historyList"><div class="no-history">No predictions yet</div></div>
+        </div>
+    </div>
+    <div class="page-content" id="telegramPage">
+        <div class="telegram-container">
+            <div class="input-group"><label class="input-label">🤖 Bot Token</label><input type="text" class="telegram-input" id="botToken" placeholder="Enter your Telegram bot token"></div>
+            <div class="input-group"><label class="input-label">📢 Channel ID</label><input type="text" class="telegram-input" id="channelId" placeholder="Enter channel ID (e.g., @channel or -100...)"></div>
+            <button class="start-btn" id="startBotBtn" onclick="handleStartClick()">▶ START BOT</button>
+            <div class="telegram-status" id="telegramStatus"></div>
+            <div class="bot-running-card" id="botRunningCard">
+                <div class="bot-running-header"><div class="bot-running-title"><div class="bot-pulse"></div> Bot Running</div><button class="bot-stop-btn" onclick="stopTelegramBot()">■ STOP</button></div>
+                <div class="bot-stats">
+                    <div class="bot-stat"><div class="bot-stat-value purple" id="botTotalSent">0</div><div class="bot-stat-label">Sent</div></div>
+                    <div class="bot-stat"><div class="bot-stat-value green" id="botWinCount">0</div><div class="bot-stat-label">Wins</div></div>
+                    <div class="bot-stat"><div class="bot-stat-value red" id="botTargetWin">0</div><div class="bot-stat-label">Target</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="winModal">
+        <div class="modal-box">
+            <div class="modal-icon">🎯</div>
+            <div class="modal-title">Set Target Wins</div>
+            <div class="modal-subtitle">How many WINS should the bot achieve before stopping?</div>
+            <div class="win-preset-row">
+                <div class="win-preset" onclick="selectPreset(this,5)">5</div>
+                <div class="win-preset" onclick="selectPreset(this,10)">10</div>
+                <div class="win-preset" onclick="selectPreset(this,20)">20</div>
+                <div class="win-preset" onclick="selectPreset(this,50)">50</div>
+                <div class="win-preset" onclick="selectPreset(this,100)">100</div>
+            </div>
+            <div class="modal-input-group"><label class="modal-input-label">Or enter custom number</label><input type="number" class="modal-input" id="winCountInput" placeholder="e.g. 15" min="1" max="999" oninput="clearPresetSelection()"></div>
+            <div class="modal-btn-row"><button class="modal-btn cancel" onclick="closeWinModal()">Cancel</button><button class="modal-btn confirm" onclick="confirmAndStart()">🚀 START</button></div>
+        </div>
+    </div>
+    <div class="nav-wrapper">
+        <nav class="bottom-nav" id="bottomNav">
+            <div class="ripple-container" id="rippleContainer"></div>
+            <div class="nav-item active" data-title="ʜᴏᴍᴇ" data-icon="home" data-page="homePage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="nav-label">Home</span><div class="active-dot"></div></div>
+            <div class="nav-item" data-title="sᴇʀᴠᴇʀ" data-icon="server" data-page="serverPage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div><span class="nav-label">Server</span><div class="active-dot"></div></div>
+            <div class="nav-item" data-title="ʜɪsᴛᴏʀʏ" data-icon="history" data-page="historyPage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="nav-label">History</span><div class="active-dot"></div></div>
+            <div class="nav-item" data-title="ᴛᴇʟᴇɢʀᴀᴍ" data-icon="telegram" data-page="telegramPage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-17.15 6.858a1.878 1.878 0 0 0-.1 3.456l3.942 1.617 1.617 5.131a1.188 1.188 0 0 0 1.928.467l2.322-2.322 4.373 3.269a1.878 1.878 0 0 0 2.883-1.074l3.393-15.612a2.24 2.24 0 0 0-2.186-2.005z"/><line x1="9" y1="14" x2="13" y2="10"/></svg></div><span class="nav-label">Telegram</span><div class="active-dot"></div></div>
+        </nav>
     </div>
 
-    <div id="securityScreen">
-        <div class="glass-panel">
-            <i class="fas fa-fingerprint lock-icon"></i>
-            <h2 style="color:#fff; margin-bottom:5px;">SYSTEM LOCKED</h2>
-            <p style="color:#aaa; font-size:12px;">RAO SAHAB PREMIUM V.52</p>
-            
-            <div style="margin-top:20px; font-size:10px; color:var(--theme-color);">YOUR DEVICE ID (CLICK TO COPY)</div>
-            <div class="device-id-box" id="deviceIdDisplay" onclick="copyDeviceId()">LOADING...</div>
-            
-            <input type="text" id="inputKey" class="inp-license" placeholder="PASTE LICENSE KEY HERE">
-            <button class="btn-unlock" onclick="validateLicense()">UNLOCK NOW</button>
-            
-            <div style="margin-top:15px;">
-                <button onclick="window.open('https://t.me/RAOPAPAJI')" style="background:none; border:none; color:#0088cc; font-size:12px; cursor:pointer;">
-                    <i class="fab fa-telegram"></i> GET KEY FROM ADMIN
-                </button>
-            </div>
-        </div>
-    </div>
+<script>
+const icons={home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',server:'<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',history:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',telegram:'<path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-17.15 6.858a1.878 1.878 0 0 0-.1 3.456l3.942 1.617 1.617 5.131a1.188 1.188 0 0 0 1.928.467l2.322-2.322 4.373 3.269a1.878 1.878 0 0 0 2.883-1.074l3.393-15.612a2.24 2.24 0 0 0-2.186-2.005z"/><line x1="9" y1="14" x2="13" y2="10"/>'};
 
-    <div id="mainApp">
+let is30Sec=false,lastFetchedSecond=-1;
+let currentPrediction=null,currentPeriod=null,currentPredictedNumber=null,currentConfidence=null;
+let predictionHistory=JSON.parse(localStorage.getItem('predictionHistory')||'[]');
+let totalPass=predictionHistory.filter(h=>h.isWin).length;
+let totalFail=predictionHistory.filter(h=>!h.isWin).length;
+let totalBets=predictionHistory.length;
+let currentGameTypeFilter='30S',winFilterActive=false,longPressTimer=null;
+const LONG_PRESS_DURATION=800;
+const API_30S='https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json';
+const API_1M='https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json';
 
-        <div class="garland"></div>
-        <div class="rgb-border" id="rgbBorder"></div>
-        <div class="flower-rain-container" id="flowerContainer"></div>
+const STICKER_IDS={
+    SESSION_START:"CAACAgUAAxkBAAEPzZ1pGyMciiSGpafrEuWn8sIpUOY7LAACEBYAAgvYYFZw-0A5gsyL8DYE",
+    SESSION_END:"CAACAgUAAxkBAAEPzZ9pGyMgrQcCQ1CfxkxiRBWDt8BAWAACVBMAAn5aYFbgPVLalZCklzYE",
+    WIN_1:"CAACAgUAAxkBAAEGwsFovqmB6jgSkGhBeQmBKWbVxHjk9wAC0hcAAsPycVSffCbGo2_kcB4E",
+    WIN_2:"CAACAgUAAxkBAAEGwqhovqqeM1R9IpH-ZxVnW9_d6LvGPQACUxMAAkPLSVVfxaN8acPr9h4E",
+    ORIGINAL:["CAACAgUAAxkBAAEPzHppGo4r_YKMiiwDwVnWPG3zevNamwACfRcAAlgJMFUIaM2jq2vLQjYE","CAACAgUAAxkBAAEPzHtpGo4sJMNxv10U5OBPHX4bC9oAAbwAAqkcAAJ5QShVbXSBpWkhXpM2BA","CAACAgUAAxkBAAEPzIJpGo43vasVJIRVhQIWhkwa-mPMmgACCRkAAsXuMFX3rmGxUPezRDYE","CAACAgUAAxkBAAEPzIRpGo462DdBx8TSYYLGdgxYRTYSIwACvxMAAorZMVWw-wABC3iNJok2BA","CAACAgUAAxkBAAEPzIZpGo48O78E3FF10uB8inzo4LMAAY8AAmwaAAKOmTBVmGl4UB4dV_82BA","CAACAgUAAxkBAAEPzIhpGo49QreiCHAr_4aZFl7TRfwttgACFxkAAlXJKFWmgYbblCI0CTYE","CAACAgUAAxkBAAEPzIppGo4_jza6ParoJXewoHUCqPwoYwAC4RgAAiuPMFUOcyPoR8JC5jYE","CAACAgUAAxkBAAEPzIxpGo5BwxOvxV1oTDYxkq4htnpq-gACwBgAAvTvMFXao8FMbedOsjYE","CAACAgUAAxkBAAEPzI5pGo5G7yIc4AABe8Mljb6pOow0WB4AAokWAALKdTFVXAdl8XJo0jc2BA"],
+    RANDOM:["CAACAgUAAxkBAAEPzJhpGo5VvKAiU-Xtp0EOX5nTptPcNAACGhQAArBSeVThRb8gLvmIDzYE","CAACAgUAAxkBAAEPzXNpGx-9LgoYflb3VvYNqhluEsgS3QACrBcAApi86VXGUUGNIdKDaTYE","CAACAgUAAxkBAAEPzXVpGx_M6OJ-uVuKeT3tvxzQfXEn8wACHRUAAsOn4Fc2h9u69xnxRzYE","CAACAgUAAxkBAAEPzXdpGx_OVU3so6Q1PgJYUaAKsG3-2QAC3RgAAno74Fdni-89wX4mNjYE","CAACAgUAAxkBAAEPzXlpGx_W_1xeKXQqFv0QOmWVNltkpAAC_xUAApL0UFVbEO-2F_nXITYE"]
+};
 
-        <div class="fixed-header">
-            <div class="profile-section" onclick="switchTab('tabSettings', document.querySelectorAll('.nav-item')[3])">
-                <div class="user-avatar" id="headerAvatar" style="background-image: url('https://cdn-icons-png.flaticon.com/512/149/149071.png');"></div>
-                <div class="user-text">
-                    <span class="user-name" id="headerName">RAO SAHAB</span>
-                    <span class="user-status">🇮🇳 INDIA • <span class="live-badge">LIVE</span> <span id="onlineUsers">1240</span> Online</span>
-                </div>
-            </div>
-            <div class="fixed-title">RAO SAHAB<br>V.52 MAX</div>
-        </div>
+const PHOTO_URLS={
+    SESSION_START:"https://ibb.co/4ywdxNd",
+    SESSION_END:"https://ibb.co/b5PDFpSb",
+    BIG_30S:"https://ibb.co/hxKHXcb4",
+    SMALL_30S:"https://ibb.co/Z6t3RR76",
+    BIG_1M:"https://ibb.co/Hf01G0m9",
+    SMALL_1M:"https://ibb.co/kVj8wMt6"
+};
 
-        <div id="resultPopup">
-            <div class="popup-box">
-                <div class="popup-title" id="popTitle">WIN</div>
-                <div class="popup-num" id="popNum">0</div>
-            </div>
-        </div>
+let telegramBotActive=false,telegramBotToken='',telegramChannelId='';
+let telegramTargetWins=0,telegramCurrentWins=0,telegramTotalSent=0;
+let telegramLastPeriod=null,originalStickerIndex=0;
+let lastPredictionMsgId=null;
+let sessionStartTime=0;
 
-        <div id="calcModal" onclick="if(event.target==this)this.style.display='none'">
-            <div class="modal-content">
-                <h3 style="color:var(--purple); margin-bottom:15px; font-family:'Rajdhani';">💰 MONEY MANAGEMENT</h3>
-                <input type="number" id="baseBet" placeholder="Base Bet (e.g. 10)" style="width:100%; padding:10px; margin-bottom:10px; background:#222; border:1px solid #444; color:#fff; text-align:center;">
-                <button class="btn-hacker" onclick="calcMartingale()" style="padding:5px;">CALCULATE LEVELS</button>
-                <div id="calcResults" style="margin-top:10px;"></div>
-                <button class="btn-stop btn-hacker" style="margin-top:15px;" onclick="document.getElementById('calcModal').style.display='none'">CLOSE</button>
-            </div>
-        </div>
+/* ══════════ MESSAGE QUEUE ══════════ */
+let msgQueue=[],queueRunning=false;
+function enqueue(fn){msgQueue.push(fn);if(!queueRunning)drainQueue();}
+async function drainQueue(){
+    if(queueRunning)return;queueRunning=true;
+    while(msgQueue.length>0){
+        const task=msgQueue.shift();
+        try{await task();}catch(e){console.error('Queue err:',e);}
+        if(msgQueue.length>0) await sleep(100);
+    }
+    queueRunning=false;
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
-        <div class="container">
-            
-            <div class="divine-header">
-                <div class="krishna-container">
-                    <div class="divine-aura"></div>
-                    <div class="krishna-img">
-                        <img src="https://i.ibb.co/LDtsvwHt/photo-6314602691614674283-x.jpg" onerror="this.src='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXN6aGZ6aGZ6aGZ6aGZ6aGZ6aGZ6aGZ6aGZ6aGZ6aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l1J9FwSQMezfQrQR2/giphy.gif'">
-                    </div>
-                </div>
-                <div class="hindi-text">दादा कृष्ण</div>
-                <div style="color:var(--gold); font-size:10px; margin-top:5px;">RAO SAHAB V.52 ACTIVE</div>
-                <div class="jhalar">🎋</div>
-            </div>
+updateHistoryDisplay();updateStatsDisplay();syncGauges();
 
-            <div class="stats-row">
-                <div class="stat-box profit" id="profitBox">
-                    <div class="stat-val" style="color:var(--gold);" id="displayProfit">₹0</div>
-                    <div class="stat-label">SESSION PROFIT</div>
-                    <div class="target-container">
-                        <div class="target-fill" id="targetBar"></div>
-                    </div>
-                    <div style="font-size:9px; color:#555; text-align:right; margin-top:2px;">DAILY TARGET: ₹5000</div>
-                </div>
-            </div>
+function getISTTimeString(){
+    const now=new Date();const ist=new Date(now.getTime()+5.5*3600000+now.getTimezoneOffset()*60000);
+    let h=ist.getHours();const m=String(ist.getMinutes()).padStart(2,'0');const s=String(ist.getSeconds()).padStart(2,'0');
+    const ampm=h>=12?'pm':'am';h=h%12;if(h===0)h=12;return h+':'+m+':'+s+' '+ampm;
+}
 
-            <div id="tabHome" class="tab-content active">
-                
-                <div class="trend-row">
-                    <div class="trend-box win-graph-box"><span class="trend-label" style="color:var(--theme-color);">WIN TREND</span><div class="trend-line"><svg class="svg-line" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M0,55 Q20,50 40,20 T80,15 T100,30" class="path-win"/></svg></div></div>
-                    <div class="trend-box loss-graph-box"><span class="trend-label" style="color:var(--red);">LOSS TREND</span><div class="trend-line"><svg class="svg-line" viewBox="0 0 100 60" preserveAspectRatio="none"><path d="M0,15 Q20,20 40,50 T80,55 T100,20" class="path-loss"/></svg></div></div>
-                </div>
+function formatDuration(ms){
+    const totalSec=Math.floor(ms/1000);
+    if(totalSec<60) return totalSec+' seconds';
+    const min=Math.floor(totalSec/60);const sec=totalSec%60;
+    if(min<60) return min+' minute'+(min>1?'s':'')+(sec>0?' '+sec+' sec':'');
+    const hr=Math.floor(min/60);const rm=min%60;
+    return hr+' hour'+(hr>1?'s':'')+(rm>0?' '+rm+' min':'');
+}
 
-                <div class="main-info-area">
-                    <div class="big-image-box">
-                        <div class="scanning-line"></div>
-                        <img src="https://i.ibb.co/9HRqYqpg/photo-6311876740296412591-y.jpg" onerror="this.src='https://via.placeholder.com/200x140?text=SCANNING'">
-                    </div>
-                    <div class="meters-col">
-                        <div class="meter-box">
-                            <svg class="meter-svg" viewBox="0 0 60 60"><circle class="meter-circle-bg" cx="30" cy="30" r="28"></circle><circle id="meterStab" class="meter-circle-val" cx="30" cy="30" r="28"></circle></svg>
-                            <div class="meter-text" id="txtStab">0%</div>
-                            <div class="meter-details"><div class="meter-label">STABLE</div><div class="meter-sub">HIGH</div></div>
-                        </div>
-                        <div class="meter-box">
-                            <svg class="meter-svg" viewBox="0 0 60 60"><circle class="meter-circle-bg" cx="30" cy="30" r="28"></circle><circle id="meterTrend" class="meter-circle-val" cx="30" cy="30" r="28" style="stroke: var(--neon-blue);"></circle></svg>
-                            <div class="meter-text" id="txtTrend">0%</div>
-                            <div class="meter-details"><div class="meter-label">TREND</div><div class="meter-sub">TITANIUM</div></div>
-                        </div>
-                        <div class="meter-box">
-                            <svg class="meter-svg" viewBox="0 0 60 60"><circle class="meter-circle-bg" cx="30" cy="30" r="28"></circle><circle id="meterPower" class="meter-circle-val" cx="30" cy="30" r="28" style="stroke: var(--gold);"></circle></svg>
-                            <div class="meter-text" id="txtPower">0%</div>
-                            <div class="meter-details"><div class="meter-label">POWER</div><div class="meter-sub">MAX</div></div>
-                        </div>
-                    </div>
-                </div>
+function getPredictionPhoto(pred,g30){
+    if(g30) return pred==='BIGG'?PHOTO_URLS.BIG_30S:PHOTO_URLS.SMALL_30S;
+    return pred==='BIGG'?PHOTO_URLS.BIG_1M:PHOTO_URLS.SMALL_1M;
+}
 
-                <div class="pattern-row" id="patternVis">
-                    <div style="color:#666; font-size:10px;">WAITING FOR HISTORY...</div>
-                </div>
+function buildPredictionCaption(period,prediction,number,confidence){
+    const gameLabel=is30Sec?'30 s':'1 M';
+    const resultText=prediction==='BIGG'?'𝐁ɪɢɢ '+number:'𝐒ᴍᴀʟʟ '+number;
+    return '▰▰▰ ᴀᴋᴇʟᴀ ᴀɪ ᴜʟᴛʀᴀ ᴘʀᴇᴅɪᴄᴛɪᴏɴ ▰▰▰\n\n'+
+        '   ➠  🎰 𝐆ᴀᴍᴇ   ⇝ 𝐀ʟʟ 𝐆ᴀᴍᴇ\n'+
+        '   ➠  💸 𝐖ɪɴɢᴏ ⇝ '+gameLabel+'\n'+
+        '   ➠  🎁 𝐏ᴇʀɪᴏᴅ⇝ '+period+'\n'+
+        '   ➠ 💥 𝐑ᴇsᴜʟᴛ ⇝ '+resultText+'\n'+
+        '   ➠ 🔥 𝐂ᴏɴғɪᴅᴇɴᴄᴇ ⇝ '+confidence+' %\n'+
+        '   ➠  🚀 𝐒ᴇʀᴠᴇʀ ⇝ 𝐍ᴏᴠᴀ x 𝐆ᴇɴ 2\n\n'+
+        '▰▰▰ ᴘᴏᴡᴇʀᴅ ʙʏ ᴀᴋᴇʟᴀ ᴛʀᴀᴅᴇʀ ▰▰▰';
+}
 
-                <div style="font-size:10px; color:#aaa; text-align:center; margin-bottom:5px;">SELECT GAME TO ACTIVATE</div>
-                <div class="slider-container" id="gameSlider"></div>
+/* ══════════ AI ENGINE ══════════ */
+function advancedPredict(data){
+    if(!data||data.length<3) return{prediction:'BIGG',number:7,confidence:52};
+    const nums=data.map(d=>parseInt(d.number));const len=nums.length;const S=new Float64Array(10);
+    const W=Math.min(len,40);const ewf=new Float64Array(10);let tW=0;
+    for(let i=0;i<W;i++){const w=Math.exp(-i*0.055);ewf[nums[i]]+=w;tW+=w;}
+    const avg1=tW/10;for(let d=0;d<10;d++) S[d]+=(avg1-ewf[d])*2.2;
+    for(let d=0;d<10;d++){let gap=W;for(let i=0;i<W;i++){if(nums[i]===d){gap=i;break;}}S[d]+=(1/(1+Math.exp(-0.35*(gap-5))))*5.5;}
+    if(len>=10){const T=Array.from({length:10},()=>new Float64Array(10));const TC=new Float64Array(10);const depth=Math.min(len-1,60);for(let i=0;i<depth;i++){T[nums[i+1]][nums[i]]++;TC[nums[i+1]]++;}const cur=nums[0];if(TC[cur]>=3){for(let d=0;d<10;d++) S[d]+=(T[cur][d]/TC[cur])*9;}}
+    if(len>=15){const T2={};const depth2=Math.min(len-2,45);for(let i=0;i<depth2;i++){const k=nums[i+2]*10+nums[i+1];if(!T2[k])T2[k]={c:new Float64Array(10),t:0};T2[k].c[nums[i]]++;T2[k].t++;}const ck=nums[1]*10+nums[0];if(T2[ck]&&T2[ck].t>=2){for(let d=0;d<10;d++) S[d]+=(T2[ck].c[d]/T2[ck].t)*7;}}
+    if(len>=20){const T3={};const depth3=Math.min(len-3,40);for(let i=0;i<depth3;i++){const k=nums[i+3]*100+nums[i+2]*10+nums[i+1];if(!T3[k])T3[k]={c:new Float64Array(10),t:0};T3[k].c[nums[i]]++;T3[k].t++;}const ck3=nums[2]*100+nums[1]*10+nums[0];if(T3[ck3]&&T3[ck3].t>=2){for(let d=0;d<10;d++) S[d]+=(T3[ck3].c[d]/T3[ck3].t)*5;}}
+    if(len>=12){const rLen=Math.min(5,len),oLen=Math.min(25,len-5);const recent=new Float64Array(10),older=new Float64Array(10);for(let i=0;i<rLen;i++) recent[nums[i]]++;for(let i=5;i<5+oLen;i++) older[nums[i]]++;for(let d=0;d<10;d++){const rR=recent[d]/rLen,oR=oLen>0?older[d]/oLen:0.1;if(oR>0.06&&rR<0.05) S[d]+=3.0;if(rR>=0.5&&oR<0.12) S[d]-=1.8;}}
+    const bs=nums.slice(0,Math.min(20,len)).map(n=>n>=5?1:0);let bsStk=1;while(bsStk<bs.length&&bs[bsStk]===bs[0]) bsStk++;if(bsStk>=3){const p=Math.min(bsStk*1.6,8);(bs[0]===1?[0,1,2,3,4]:[5,6,7,8,9]).forEach(d=>S[d]+=p);}
+    if(bs.length>=7){let alt=0;for(let i=0;i<6;i++) if(bs[i]!==bs[i+1]) alt++;if(alt>=5)(bs[0]===1?[0,1,2,3,4]:[5,6,7,8,9]).forEach(d=>S[d]+=2.5);}
+    const oeW=nums.slice(0,Math.min(10,len));const oddC=oeW.filter(x=>x%2===1).length;if(oddC>=7) [0,2,4,6,8].forEach(d=>S[d]+=2.0);else if(oddC<=3) [1,3,5,7,9].forEach(d=>S[d]+=2.0);
+    if(len>=5){let ema=nums[0];for(let i=1;i<Math.min(10,len);i++) ema=0.2*nums[i]+0.8*ema;const dev=ema-4.5;if(Math.abs(dev)>1.2){for(let d=0;d<10;d++) S[d]+=(4.5-d)*dev*0.12;}}
+    if(len>=3){const sm=(nums[0]+nums[1]+nums[2])%10;S[sm]+=2.0;S[(sm+5)%10]+=1.2;const sm2=(nums[0]*nums[1])%10;S[sm2]+=1.5;}
+    if(len>=2){const xv=nums[0]^nums[1];if(xv<=9) S[xv]+=1.8;const dif=Math.abs(nums[0]-nums[1]);if(dif<=9){S[dif]+=1.5;S[9-dif]+=1.0;}if(len>=3){const xv2=nums[1]^nums[2];if(xv2<=9) S[xv2]+=1.0;}}
+    if(len>=3){const d1=nums[0]-nums[1],d2=nums[1]-nums[2];if(d1===d2&&d1!==0){const pred=nums[0]+d1;if(pred>=0&&pred<=9) S[pred]+=5;}if(Math.abs(d1-d2)<=1&&d1!==0){const pred=nums[0]+d1;if(pred>=0&&pred<=9) S[pred]+=2.5;}}
+    if(len>=6){for(let j=2;j<Math.min(len-2,35);j++){if(nums[j+1]===nums[1]&&nums[j]===nums[0]&&j>=1){S[nums[j-1]]+=3.5;}}}
+    if(len>=6){const w8=nums.slice(0,Math.min(8,len));const mu=w8.reduce((a,b)=>a+b,0)/w8.length;let vr=w8.reduce((s,x)=>s+(x-mu)**2,0)/w8.length;if(vr<3){for(let d=0;d<10;d++){const dist=Math.abs(d-mu);if(dist<=2) S[d]+=1.8-dist*0.4;}}else if(vr>9){S[0]+=1.2;S[9]+=1.2;S[1]+=0.5;S[8]+=0.5;}}
+    if(len>=2){const gr=Math.round(nums[0]*0.618)%10;S[gr]+=1.5;const fib=(nums[0]+nums[1])%10;S[fib]+=1.2;const inv=(10-nums[0])%10;S[inv]+=1.0;}
+    let best=0;for(let d=1;d<10;d++) if(S[d]>S[best]) best=d;
+    const sorted=[...S].sort((a,b)=>b-a);const margin=sorted[0]-sorted[1];const totalRange=sorted[0]-sorted[9];const conf=Math.min(97,Math.max(52,Math.round(54+margin/(Math.max(totalRange,1))*42)));
+    return{prediction:best>=5?'BIGG':'SMALL',number:best,confidence:conf};
+}
 
-                <div style="color:#fff; font-size:12px; margin:10px 0 5px 5px; border-left:3px solid var(--theme-color); padding-left:10px;">
-                    AI LIVE ANALYSIS (TITANIUM LOGIC)
-                </div>
-                <div class="number-graph-box" id="numGraphBox">
-                    <div style="color:#666; width:100%; text-align:center; margin-top:50px;">WAITING FOR GAME...</div>
-                </div>
+function getNumColor(n){if(n===0)return'clr-redviolet';if(n===5)return'clr-greenviolet';if([1,3,7,9].includes(n))return'clr-green';return'clr-red';}
+window.startLongPress=function(){if(longPressTimer)clearTimeout(longPressTimer);document.getElementById('winFilterBtn').classList.add('long-press-hint');longPressTimer=setTimeout(()=>{resetHistoryForCurrentGame();document.getElementById('winFilterBtn').classList.remove('long-press-hint');longPressTimer=null;},LONG_PRESS_DURATION);};
+window.cancelLongPress=function(){if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}document.getElementById('winFilterBtn').classList.remove('long-press-hint');};
+function resetHistoryForCurrentGame(){predictionHistory=predictionHistory.filter(i=>i.gameType!==currentGameTypeFilter);totalPass=predictionHistory.filter(h=>h.isWin).length;totalFail=predictionHistory.filter(h=>!h.isWin).length;totalBets=predictionHistory.length;localStorage.setItem('predictionHistory',JSON.stringify(predictionHistory));updateStatsDisplay();syncGauges();updateHistoryDisplay();if(navigator.vibrate)navigator.vibrate(100);}
+window.setGameTypeFilter=function(f){currentGameTypeFilter=f;document.querySelectorAll('#unifiedToggle .filter-option[data-filter]').forEach(o=>{o.classList.toggle('active',o.dataset.filter===f);});updateHistoryDisplay();};
+window.toggleWinFilter=function(){winFilterActive=!winFilterActive;document.getElementById('winFilterBtn').classList.toggle('active',winFilterActive);updateHistoryDisplay();};
+function updateWinLossBadge(){const w=predictionHistory.filter(h=>h.gameType===currentGameTypeFilter&&h.isWin).length;const l=predictionHistory.filter(h=>h.gameType===currentGameTypeFilter&&!h.isWin).length;document.getElementById('winCountDisplay').textContent='WIN: '+w;document.getElementById('loseCountDisplay').textContent='LOSS: '+l;}
+function updateGauge(id,val){const off=88-(val/100)*88;document.getElementById('gaugeFill'+id).style.strokeDashoffset=off;const g=document.getElementById('gauge'+id);if(val>70)g.classList.add('high');else g.classList.remove('high');}
+function syncGauges(){const total=totalPass+totalFail;const passP=total>0?Math.round(totalPass/total*100):0;const failP=total>0?Math.round(totalFail/total*100):0;const accP=total>0?Math.round(totalPass/total*100):0;const betsP=Math.min(100,Math.round(totalBets/50*100));setTimeout(()=>updateGauge(1,passP),100);setTimeout(()=>updateGauge(2,failP),200);setTimeout(()=>updateGauge(3,accP),300);setTimeout(()=>updateGauge(4,betsP),400);}
+function calculateAccuracy(){const t=totalPass+totalFail;return t===0?'0%':(totalPass/t*100).toFixed(1)+'%';}
+function updateStatsDisplay(){document.getElementById('passCount').textContent=totalPass;document.getElementById('failCount').textContent=totalFail;document.getElementById('accuracyValue').textContent=calculateAccuracy();document.getElementById('betsValue').textContent=totalBets;}
+function getActualResult(n){return parseInt(n)>=5?'BIGG':'SMALL';}
 
-                <div class="pred-card pro-card" id="predCardUi">
-                    <div style="font-size:12px; color:#ccc; margin-bottom:10px;">PERIOD: <span id="periodNum" style="color:#fff;">Wait...</span></div>
-                    <div class="timer-badge" id="timer">00:00</div>
-                    <div id="resultText" class="result-display wait">READY</div>
-                    <div id="targetDisplay" style="color:var(--gold); font-size:12px; font-weight:bold; margin-top:5px;">TITANIUM V52 ENGINE</div>
-                    <div id="coldNumDisplay" style="font-size:11px; color:var(--neon-blue); margin-top:5px; display:none;">COLD NUM: --</div>
-                    <div id="serverStatusDisplay" style="font-size:10px; color:#555; margin-top:5px;">SERVER: OFFLINE</div>
-                </div>
+/* ══════════ CHECK PREVIOUS PREDICTION ══════════ */
+function checkPreviousPrediction(data){
+    if(!currentPrediction||!currentPeriod)return;
+    const r=data.find(i=>i.issueNumber===currentPeriod);
+    if(r){
+        const actual=getActualResult(r.number);
+        const isWin=(currentPrediction==='BIGG'&&actual==='BIGG')||(currentPrediction==='SMALL'&&actual==='SMALL');
+        const numMatch=currentPredictedNumber===parseInt(r.number);
+        if(isWin)totalPass++;else totalFail++;
+        totalBets++;
+        predictionHistory.unshift({period:currentPeriod,prediction:currentPrediction,predictedNumber:currentPredictedNumber,actual,number:r.number,actualColor:r.color,isWin,numMatch,gameType:is30Sec?'30S':'1M',timestamp:Date.now()});
+        if(predictionHistory.length>50)predictionHistory=predictionHistory.slice(0,50);
+        localStorage.setItem('predictionHistory',JSON.stringify(predictionHistory));
+        updateHistoryDisplay();updateStatsDisplay();syncGauges();
+        if(navigator.vibrate)navigator.vibrate(isWin?[100,50,100,50,100]:[300]);
 
-                <div class="server-box pro-card">
-                    <div class="srv-grid">
-                        <div class="srv-btn active" id="btnTitanium" onclick="selMain(1, this)">TITANIUM</div>
-                        <div class="srv-btn" id="btnMatrix" onclick="selMain(2, this)">MATRIX</div>
-                        <div class="srv-btn" id="btnJava" onclick="selMain(3, this)">JAVA (MATH)</div>
-                    </div>
-                    <div class="sub-srv-grid">
-                        <div class="sub-btn active" onclick="selSub('A', this)">NODE A</div>
-                        <div class="sub-btn" onclick="selSub('B', this)">NODE B</div>
-                        <div class="sub-btn" onclick="selSub('C', this)">NODE C</div>
-                    </div>
-                    <div id="srvConnectMsg" class="srv-status">CONNECTING...</div>
-                    <div class="timer-grid">
-                        <div class="timer-btn active" onclick="setTimer(30, this)">30s</div>
-                        <div class="timer-btn" onclick="setTimer(60, this)">1m</div>
-                        <div class="timer-btn" onclick="setTimer(180, this)">3m</div>
-                        <div class="timer-btn" onclick="setTimer(300, this)">5m</div>
-                    </div>
-                </div>
-
-                <div id="emergencyBox">
-                    <div style="text-align:center; color:var(--emergency); font-size:12px; margin-bottom:5px; font-weight:900;">⚠️ EMERGENCY PROTOCOL ACTIVE</div>
-                    <div class="em-grid">
-                        <div class="em-btn" id="btnM9" onclick="selMain(4, this)">
-                            SERVER M-9
-                            <div class="em-acc">ACCURACY: <span id="accM9">99%</span></div>
-                        </div>
-                        <div class="em-btn" id="btnAIPro" onclick="selMain(5, this)">
-                            SERVER AI PRO
-                            <div class="em-acc">ACCURACY: <span id="accAI">99%</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="sessionBtn" class="btn-hacker" onclick="toggleSession()"><i class="fas fa-rocket"></i> START SESSION</button>
-                <button class="btn-calc" onclick="document.getElementById('calcModal').style.display='flex'"><i class="fas fa-calculator"></i> MONEY MANAGEMENT TOOL</button>
-                
-                <div class="balls-grid-container" id="ballsGrid">
-                    <div class="balls-row" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-                        <div class="ball-item" id="ball-0"><div class="ball-bg-glow"></div>0</div>
-                        <div class="ball-item" id="ball-1"><div class="ball-bg-glow"></div>1</div>
-                        <div class="ball-item" id="ball-2"><div class="ball-bg-glow"></div>2</div>
-                        <div class="ball-item" id="ball-3"><div class="ball-bg-glow"></div>3</div>
-                        <div class="ball-item" id="ball-4"><div class="ball-bg-glow"></div>4</div>
-                        <div class="ball-item" id="ball-5"><div class="ball-bg-glow"></div>5</div>
-                        <div class="ball-item" id="ball-6"><div class="ball-bg-glow"></div>6</div>
-                        <div class="ball-item" id="ball-7"><div class="ball-bg-glow"></div>7</div>
-                        <div class="ball-item" id="ball-8"><div class="ball-bg-glow"></div>8</div>
-                        <div class="ball-item" id="ball-9"><div class="ball-bg-glow"></div>9</div>
-                    </div>
-                </div>
-                
-                <div class="fund-box" id="fundDisplayBox">
-                    <div class="fund-title">RECOMMENDED BET</div>
-                    <div class="fund-amount" id="fundText">START - LEVEL 1</div>
-                </div>
-                
-                <div class="owner-watermark">OWNER RAO SAHAB</div>
-                
-                <div class="live-feed-container" id="liveFeedBox">
-                    <div class="feed-title">LIVE VIP WINNINGS & FEEDBACK</div>
-                    <div id="feedList"></div>
-                </div>
-
-            </div>
-
-            <div id="tabGame" class="tab-content">
-                <div class="game-frame-container">
-                    <div style="text-align:center; color:var(--gold); font-size:10px; margin-bottom:5px;">AI HIGHLIGHTER ACTIVE</div>
-                    <div id="aiOverlay" class="ai-overlay"></div>
-                    <iframe id="gameFrame" src="about:blank"></iframe>
-                </div>
-            </div>
-
-            <div id="tabHistory" class="tab-content">
-                <h3 style="text-align:center; color:#fff; font-family:'Rajdhani';">BOT PREDICTION LOGS</h3>
-                <table style="width:100%; border-collapse:collapse; margin-top:10px; text-align:center; font-size:13px;">
-                    <thead><tr><th style="border-bottom:1px solid var(--theme-color);">PERIOD</th><th style="border-bottom:1px solid var(--theme-color);">PRED</th><th style="border-bottom:1px solid var(--theme-color);">RESULT</th><th style="border-bottom:1px solid var(--theme-color);">STATUS</th></tr></thead>
-                    <tbody id="historyTable"></tbody>
-                </table>
-            </div>
-
-            <div id="tabSettings" class="tab-content">
-                <h3 style="text-align:center; color:#fff; font-family:'Rajdhani'; margin-bottom:15px;">SYSTEM CONFIG</h3>
-                
-                <div class="profile-card pro-card">
-                    <div class="profile-avatar" id="settingsAvatar"></div>
-                    <div class="profile-info">
-                        <h3 id="profileName">USER</h3>
-                        <span class="profile-badge">TITANIUM USER</span>
-                    </div>
-                </div>
-
-                <div class="cfg-panel pro-card">
-                    <h4 style="color:var(--gold); margin-bottom:5px;">EDIT PROFILE</h4>
-                    <input type="text" id="inputNewName" class="inp-key" style="margin:5px 0; font-size:12px;" placeholder="ENTER NEW NAME">
-                    <div style="display:flex; gap:5px; flex-direction: column;">
-                        <label class="btn-hacker" style="font-size:12px; padding:8px; margin:0; text-align:center;">
-                            UPLOAD PIC <input type="file" id="uploadPicInput" hidden accept="image/*" onchange="processImage(this)">
-                        </label>
-                        <button class="btn-hacker" style="font-size:12px; padding:8px; margin:0; background:var(--theme-color); color:#000;" onclick="manualUpdateProfile()">UPDATE PROFILE NOW</button>
-                        <button class="btn-hacker" style="font-size:10px; padding:8px; margin:0; background:var(--red);" onclick="removePhoto()">REMOVE PIC</button>
-                    </div>
-                </div>
-                
-                <div class="cfg-panel pro-card">
-                    <h4 style="color:var(--theme-color); margin-bottom:10px;">8 COLOR THEME</h4>
-                    <div class="color-picker">
-                        <div class="color-dot" style="background:#00ff41;" onclick="setTheme('#00ff41')"></div>
-                        <div class="color-dot" style="background:#ff0055;" onclick="setTheme('#ff0055')"></div>
-                        <div class="color-dot" style="background:#00f3ff;" onclick="setTheme('#00f3ff')"></div>
-                        <div class="color-dot" style="background:#FFD700;" onclick="setTheme('#FFD700')"></div>
-                        <div class="color-dot" style="background:#bf00ff;" onclick="setTheme('#bf00ff')"></div>
-                        <div class="color-dot" style="background:#ff7f00;" onclick="setTheme('#ff7f00')"></div>
-                        <div class="color-dot" style="background:#ffffff;" onclick="setTheme('#ffffff')"></div>
-                        <div class="color-dot" style="background:#1e90ff;" onclick="setTheme('#1e90ff')"></div>
-                    </div>
-                </div>
-
-                <div class="cfg-panel pro-card">
-                    <div class="switch-row"><span style="color:var(--emergency); font-weight:900;">⚠️ EMERGENCY MODE (MATH M9)</span><label class="switch"><input type="checkbox" id="emergencySwitch" onchange="togEmergency()"><span class="slider"></span></label></div>
-                    <hr style="border-color:#222; margin:15px 0;">
-                    
-                    <div class="switch-row"><span style="color:var(--gold);">SEND INSTRUCTIONS</span><label class="switch"><input type="checkbox" id="instrSwitch"><span class="slider"></span></label></div>
-                    <hr style="border-color:#222; margin:15px 0;">
-
-                    <div class="switch-row"><span style="color:var(--gold);">FEED BOX (RATING)</span><label class="switch"><input type="checkbox" id="feedSwitch" onchange="tog('feedBoxUi')"><span class="slider"></span></label></div>
-                    <div id="feedBoxUi">
-                        <div class="stars" id="starContainer">
-                            <span class="star" onclick="rate(1)">★</span><span class="star" onclick="rate(2)">★</span><span class="star" onclick="rate(3)">★</span><span class="star" onclick="rate(4)">★</span><span class="star" onclick="rate(5)">★</span>
-                        </div>
-                        <textarea id="feedMsg" class="inp-feed" placeholder="Write comment..."></textarea>
-                        <button class="btn-hacker" style="margin-top:5px; background: #0088cc; color:#fff;" onclick="sendFeedback()"><i class="fab fa-telegram"></i> SEND TO ADMIN</button>
-                    </div>
-                    <hr style="border-color:#222; margin:15px 0;">
-
-                    <div class="switch-row"><span style="color:#FF00FF; font-weight:900;">🌸 FLOWER RAIN LOOP</span><label class="switch"><input type="checkbox" id="flowerSwitch" onchange="toggleFlowers()"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span style="color:#ff0000; font-weight:900;">⚡ HARD DISCO MODE</span><label class="switch"><input type="checkbox" id="hardDiscoSwitch" onchange="toggleHardDisco()"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span style="color:var(--gold); font-weight:900;">🛡️ SAFE MODE (AUTO SKIP)</span><label class="switch"><input type="checkbox" id="safeModeSwitch" checked><span class="slider"></span></label></div>
-
-                    <div class="switch-row"><span style="color:var(--red); font-weight:900;">REVERSE TELEGRAM</span><label class="switch"><input type="checkbox" id="reverseSwitch"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span style="color:var(--neon-blue);">AI HIGHLIGHTER</span><label class="switch"><input type="checkbox" id="aiGlowSwitch"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>DJ PARTY LIGHTS</span><label class="switch"><input type="checkbox" id="djSwitch" onchange="togDJ()"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>RGB BORDER LIGHT</span><label class="switch"><input type="checkbox" id="rgbSwitch" onchange="togRGB()"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span style="color:var(--gold);">SHOW SESSION PROFIT</span><label class="switch"><input type="checkbox" id="profitSwitch" onchange="togProfit()"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>USE COLD NUMBERS</span><label class="switch"><input type="checkbox" id="coldSwitch"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>PLAY SOUND ALERT</span><label class="switch"><input type="checkbox" id="soundSwitch" checked><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>COLOR PREDICTION MODE</span><label class="switch"><input type="checkbox" id="colorSwitch"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>PREDICTION LIMIT</span><label class="switch"><input type="checkbox" id="limitSwitch" onchange="tog('inpLimit')"><span class="slider"></span></label></div><input type="number" id="inpLimit" class="inp-mini" placeholder="Stop after N predictions">
-                    
-                    <hr style="border-color:#222; margin:15px 0;">
-                    
-                    <div class="switch-row"><span style="color:#00ff41; font-weight:900;">SHORT PRED (AUTO DEL)</span><label class="switch"><input type="checkbox" id="shortPredSwitch"><span class="slider"></span></label></div>
-
-                    <div class="switch-row"><span>TELEGRAM BOT</span><label class="switch"><input type="checkbox" id="tgSwitch"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>SEND SEASON ALERT</span><label class="switch"><input type="checkbox" id="seasonSwitch"><span class="slider"></span></label></div>
-                    <div class="switch-row"><span>INCLUDE TAGS</span><label class="switch"><input type="checkbox" id="tagSwitch" onchange="tog('inpTags')"><span class="slider"></span></label></div><input type="text" id="inpTags" class="inp-mini" placeholder="Enter Tags">
-                    <div class="switch-row"><span>INCLUDE GIFT CODE</span><label class="switch"><input type="checkbox" id="giftSwitch" onchange="tog('inpGift')"><span class="slider"></span></label></div><input type="text" id="inpGift" class="inp-mini" placeholder="Enter Gift Code">
-                    <div class="switch-row"><span>INCLUDE INVITE LINK</span><label class="switch"><input type="checkbox" id="invSwitch" onchange="tog('inpInvite')"><span class="slider"></span></label></div><input type="text" id="inpInvite" class="inp-mini" placeholder="Enter Invite Link">
-                    <div class="switch-row"><span>SHARE CHANNEL BTN</span><label class="switch"><input type="checkbox" id="chSwitch" onchange="tog('inpChannel')"><span class="slider"></span></label></div><input type="text" id="inpChannel" class="inp-mini" placeholder="Your Telegram Channel Link">
-
-                    <input type="text" id="botToken" class="inp-key" style="text-align:left; font-size:11px; margin:5px 0;" placeholder="BOT TOKEN">
-                    <div style="display:flex; gap:5px; align-items:center;"><input type="text" id="chatId" class="inp-key" style="text-align:left; font-size:11px; margin:5px 0;" placeholder="YOUR CHAT ID"><button class="btn-hacker" style="padding:5px; width:80px; font-size:11px; margin:0;" onclick="verifyChatId()">VERIFY</button></div>
-                    <button class="btn-hacker" onclick="saveCfg()" style="margin-top:10px;">SAVE CONFIG</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-nav" id="btmNav">
-            <div class="nav-item active" onclick="switchTab('tabHome', this)"><i class="fas fa-home"></i><span>HOME</span></div>
-            <div class="nav-item" onclick="switchTab('tabGame', this)"><i class="fas fa-gamepad"></i><span>GAME</span></div>
-            <div class="nav-item" onclick="switchTab('tabHistory', this)"><i class="fas fa-history"></i><span>HISTORY</span></div>
-            <div class="nav-item" onclick="switchTab('tabSettings', this)"><i class="fas fa-cog"></i><span>CONFIG</span></div>
-        </div>
-
-    </div>
-
-    <div id="toast"></div>
-    <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-
-    <script>
-        const INSTRUCTION_MSG = `🤖 *ABOUT RAO SAHAB V.52 PRO*\n\n**⚡ WHAT IS THIS BOT?**\nThis is an Advanced **AI Prediction Tool**\ndeveloped for Color Trading Games.\nIt uses high-level coding & algorithms\nto analyze market patterns like\n**Dragon, Zig-Zag, & Trends.**\n\n**💡 HOW IT WORKS:**\nWe use **Web Development & AI Tools**\nto find loopholes in game servers.\nOur goal is simple:\n**To help you make "Free Profit"**\nfrom these platforms using logic.\n\n-------------------------\n\n### 🚫 **OFFICIAL DISCLAIMER**\n\n**1. WE ARE INDEPENDENT:**\nWe are **Web Developers**, not agents.\nWe are **NOT affiliated** with any\nGaming Company (Daman/91Club/etc).\nWe work freely and are **not under**\n**the pressure** of any company.\n\n**2. FINANCIAL WARNING:**\n⚠️ **Read Carefully:**\nOnline gaming involves financial risk.\nThe money you invest is **YOUR**\nresponsibility.\n\n**3. NO LIABILITY:**\nWhile our AI Accuracy is 99%,\nmarket volatility exists.\n**We are NOT responsible for any**\n**kind of financial loss.**\nProfit & Loss is 100% yours.\n\n-------------------------\n\n**✅ OUR ADVICE:**\nAlways use our **Fund Management**\n**(Level Strategy)** to stay safe.\nPlay smartly, don't play blindly.\n\n**👑 OWNER:** RAO SAHAB\n**💻 POWERED BY:** V.52 AI SYSTEM`;
-
-        // --- SECURITY LOGIC (ENCRYPTED) ---
-        const SECRET_SALT = "RAO_GOD_MODE_SECURE_V40";
-        function getDeviceId() {
-            let id = localStorage.getItem("rao_device_id");
-            if (!id) {
-                id = Math.floor(1000 + Math.random() * 9000) + "-" + Math.floor(1000 + Math.random() * 9000) + "-" + Math.floor(1000 + Math.random() * 9000);
-                localStorage.setItem("rao_device_id", id);
-            }
-            return id;
-        }
-        function simpleHash(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) { const char = str.charCodeAt(i); hash = (hash << 5) - hash + char; hash |= 0; }
-            return Math.abs(hash).toString(16);
-        }
-
-        const myDeviceId = getDeviceId();
-        document.getElementById("deviceIdDisplay").innerText = myDeviceId;
-
-        const savedKey = localStorage.getItem("rao_license_key");
-        if(savedKey) verifyKey(savedKey, true);
-
-        function copyDeviceId() {
-            navigator.clipboard.writeText(myDeviceId);
-            Swal.fire({ toast: true, position: 'top', icon: 'success', title: 'ID COPIED! SEND TO ADMIN', showConfirmButton: false, timer: 2000, background: '#111', color: '#fff' });
-        }
-        function validateLicense() {
-            const key = document.getElementById("inputKey").value.trim();
-            if(!key) return alert("ENTER KEY");
-            verifyKey(key, false);
-        }
-        function verifyKey(key, silent) {
-            try {
-                const decoded = atob(key);
-                const parts = decoded.split("|");
-                if(parts.length !== 2) throw new Error("Invalid Format");
-                const expiryDate = parts[0]; 
-                const signature = parts[1];
-                const expectedSignature = simpleHash(myDeviceId + expiryDate + SECRET_SALT);
-
-                if (signature === expectedSignature) {
-                    const today = new Date().toISOString().split('T')[0];
-                    if (expiryDate >= today) unlockApp(key);
-                    else { if(!silent) Swal.fire({ icon: 'error', title: 'EXPIRED', text: 'Renew License', background: '#000', color: '#fff' }); localStorage.removeItem("rao_license_key"); }
-                } else { 
-                    throw new Error("Wrong ID");
+        if(telegramBotActive){
+            if(isWin){
+                /* WIN: keep message, send stickers */
+                telegramCurrentWins++;updateBotCard();
+                lastPredictionMsgId=null; // don't delete win msg
+                const origIdx=originalStickerIndex;
+                originalStickerIndex=(originalStickerIndex+1)%STICKER_IDS.ORIGINAL.length;
+                const randIdx=Math.floor(Math.random()*STICKER_IDS.RANDOM.length);
+                enqueue(()=>sendTelegramSticker(STICKER_IDS.ORIGINAL[origIdx]));
+                enqueue(()=>sendTelegramSticker(STICKER_IDS.RANDOM[randIdx]));
+                if(telegramCurrentWins>=telegramTargetWins){
+                    enqueue(async()=>{await sleep(500);await doStopBot();});
                 }
-            } catch(e) { 
-                if(!silent) {
-                    // ABUSIVE MESSAGE AS REQUESTED
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'NIKAL BSDK!',
-                        text: 'YE WALI NIKAL MADERCHOD PRENIUM LEKE AA',
-                        background: '#000',
-                        color: '#ff0000',
-                        confirmButtonColor: '#ff0000'
-                    });
+            }else{
+                /* LOSE: delete the prediction message first */
+                if(lastPredictionMsgId){
+                    const delId=lastPredictionMsgId;
+                    lastPredictionMsgId=null;
+                    enqueue(()=>deleteTelegramMessage(delId));
                 }
             }
         }
-        
-        function unlockApp(key) {
-            localStorage.setItem("rao_license_key", key);
-            document.getElementById("securityScreen").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            app.active = false; 
-            initFlowerRain();
-            initTicker(); 
-            initUserCounter();
-        }
+    }
+}
 
-        // --- NEW FEATURE SCRIPTS (TICKER, COUNTER, CALC) ---
-        function initTicker() {
-            const names = ["Ravi", "Amit", "Rahul", "Priya", "Sneha", "Vikram", "Arjun", "Karan", "Sandeep", "Vikas"];
-            const games = ["Daman", "91Club", "TC", "Goa", "BigDaddy"];
-            const t = document.getElementById('winnerTicker');
-            let html = "";
-            for(let i=0; i<20; i++) {
-                const n = names[Math.floor(Math.random()*names.length)];
-                const g = games[Math.floor(Math.random()*games.length)];
-                const a = Math.floor(Math.random()*4000) + 500;
-                html += `<div class="ticker-item">${n} won <span class="win-amt">₹${a}</span> in ${g}</div>`;
+function updateHistoryDisplay(){
+    const hl=document.getElementById('historyList');updateWinLossBadge();
+    let f=predictionHistory.filter(i=>i.gameType===currentGameTypeFilter);
+    if(winFilterActive)f=f.filter(i=>i.isWin);
+    if(!f.length){hl.innerHTML='<div class="no-history">No predictions match filters</div>';return;}
+    hl.innerHTML=f.map(i=>{const pN=i.predictedNumber!==undefined?' ('+i.predictedNumber+')':'';const hit=i.numMatch?'  🎯':'';return'<div class="history-item '+(i.isWin?'win':'lose')+'"><div class="history-left"><span class="history-period">'+i.period+' ('+i.gameType+')</span><span class="history-prediction">Predicted: '+i.prediction+pN+hit+'</span></div><div class="history-right"><span class="history-result">Result: '+i.actual+' ('+i.number+')</span><span class="history-status '+(i.isWin?'win':'lose')+'">'+(i.isWin?'WIN':'LOSE')+'</span></div></div>';}).join('');
+}
+
+function updatePrediction(data){
+    checkPreviousPrediction(data);
+    const res=advancedPredict(data);
+    document.getElementById('predictionText').textContent=res.prediction;
+    document.getElementById('predictionNum').textContent=res.number;
+    document.getElementById('predictionNum').className='prediction-num '+getNumColor(res.number);
+    document.getElementById('predictionConfidence').textContent='AI CONFIDENCE: '+res.confidence+'%';
+    const latestIssue=data[0].issueNumber;
+    currentPeriod=(BigInt(latestIssue)+1n).toString();
+    currentPrediction=res.prediction;currentPredictedNumber=res.number;currentConfidence=res.confidence;
+    document.getElementById('predictionText').classList.add('updated');document.getElementById('predictionNum').classList.add('updated');
+    setTimeout(()=>{document.getElementById('predictionText').classList.remove('updated');document.getElementById('predictionNum').classList.remove('updated');},450);
+    syncGauges();
+
+    /* TELEGRAM: queue prediction AFTER any win stickers or delete */
+    if(telegramBotActive&&currentPeriod!==telegramLastPeriod){
+        telegramLastPeriod=currentPeriod;
+        const p=currentPeriod,pr=res.prediction,n=res.number,c=res.confidence;
+        const photo=getPredictionPhoto(pr,is30Sec);
+        const caption=buildPredictionCaption(p,pr,n,c);
+        enqueue(async()=>{
+            try{
+                const result=await sendTelegramPhoto(photo,caption);
+                lastPredictionMsgId=result.result.message_id;
+                telegramTotalSent++;updateBotCard();
+            }catch(e){
+                try{
+                    const result=await sendTelegramMessage(caption);
+                    lastPredictionMsgId=result.result.message_id;
+                    telegramTotalSent++;updateBotCard();
+                }catch(e2){showTelegramStatus('error','⚠️ Send failed');}
             }
-            t.innerHTML = html;
-        }
-
-        function initUserCounter() {
-            setInterval(() => {
-                const c = Math.floor(Math.random() * (1500 - 1200) + 1200);
-                document.getElementById('onlineUsers').innerText = c;
-            }, 4000);
-        }
-
-        function calcMartingale() {
-            const base = parseInt(document.getElementById('baseBet').value);
-            if(!base) return;
-            let html = `<div class="calc-row"><b style="color:var(--gold)">LEVEL</b><b>BET AMOUNT</b></div>`;
-            let bet = base;
-            for(let i=1; i<=6; i++) {
-                html += `<div class="calc-row"><span>Level ${i}</span><span style="color:#00ff41">₹${bet}</span></div>`;
-                bet = bet * 3; 
-            }
-            document.getElementById('calcResults').innerHTML = html;
-        }
-
-        function updatePatternVis(list) {
-            const html = list.slice(0, 10).map(r => {
-                const s = getBigSmall(r.number);
-                return `<div class="pattern-dot ${s==='BIG'?'dot-b':'dot-s'}"></div>`;
-            }).reverse().join('');
-            document.getElementById('patternVis').innerHTML = html;
-        }
-
-        const GAMES = [
-            { name: "DAMAN GAME", img: "https://cdn-icons-png.flaticon.com/512/2643/2643590.png", link: "https://damanworld.top/#/register?invitationCode=613534185076" },
-            { name: "JALWA CLUB", img: "https://cdn-icons-png.flaticon.com/512/1067/1067357.png", link: "https://jalwaclub3.com/#/register?invitationCode=562647318340" },
-            { name: "OK WIN", img: "https://cdn-icons-png.flaticon.com/512/3662/3662817.png", link: "https://okwinn.work/register?invitationCode=842642415271" },
-            { name: "91 CLUB", img: "https://cdn-icons-png.flaticon.com/512/1168/1168582.png", link: "https://www.surat91.com/#/register?invitationCode=4641517434173" },
-            { name: "51 GAME", img: "https://cdn-icons-png.flaticon.com/512/8065/8065360.png", link: "https://www.51gamek.com/#/register?invitationCode=26261103525" },
-            { name: "RAJA PARTY", img: "https://cdn-icons-png.flaticon.com/512/3662/3662817.png", link: "https://www.rajaparty8.com/#/register?invitationCode=83851128686" },
-            { name: "SIKKIM GAME", img: "https://cdn-icons-png.flaticon.com/512/1168/1168582.png", link: "https://www.1sikkim.com/#/register?invitationCode=21155363278" },
-            { name: "GOA GAME", img: "https://cdn-icons-png.flaticon.com/512/8065/8065360.png", link: "http://www.goaok.link/#/register?invitationCode=81344380756" },
-            { name: "LOTTERY 7", img: "https://cdn-icons-png.flaticon.com/512/2643/2643590.png", link: "https://www.lottery7kk.com/#/register?invitationCode=364622670994" }
-        ];
-
-        // --- UPDATED STICKERS AS REQUESTED ---
-        const ASSETS = {
-            START: 'CAACAgUAAxkBAAEDEC9pCVVRUpjzq5JD0Xds7EfRQje15wACuxMAAtZgYVZaFxCncOnSvh4E', 
-            STOP: 'https://ibb.co/MyyzwtHp',
-            IMG_30: 'https://ibb.co/0yZvp9Yq', 
-            IMG_60: 'https://ibb.co/NgGhgDKL', 
-            SKIP: 'https://ibb.co/Yj541fN',
-            WIN_FIRST: "CAACAgUAAxkBAAEDEC9pCVVRUpjzq5JD0Xds7EfRQje15wACuxMAAtZgYVZaFxCncOnSvh4E",
-            WIN_MIDDLE: [
-                "CAACAgUAAxkBAAEDEDdpCXsDjwGlCNvT7EOetSaVSckH-AACvhIAAl2EYFYRGskC145Gkh4E",
-                "CAACAgUAAxkBAAEDED9pCXtTSZDN91Ecw6ubgma2zRye4AACdRUAAixnYVYGODMz3GAhmh4E",
-                "CAACAgUAAxkBAAEDEEJpCXtukJIYrmQjt6gQdbEwgXR9IAACWBkAAmvFoFeR0XR5LtIzCR4E",
-                "CAACAgUAAxkBAAEDEEVpCXuZI2yZMk7dTq3EWm_46lUjeQACShMAAosqYVYMmgGHznp3Rh4E"
-            ],
-            WIN_LAST: "CAACAgQAAxkBAAEDEGlpC0W3zuFpqApvI9QFy1ueCMPHIgACcxIAAjupeFAWe8eIo-19-B4E",
-            LOSS: [
-                "CAACAgQAAxkBAAEDEGxpC0W_HrRKrdK-RPSd89tA9OJ-CgACUA8AAmWGgFDT7olWti1e2h4E",
-                "CAACAgUAAxkBAAEDEUNpELLwfisH8fMa8RAH481Ui_6pcwACoBoAAnliGVS2SjPOJAYbeR4E",
-                "CAACAgUAAxkBAAEDEUZpELMR9N6KHVMFKXr6yUbm6HT50gAC2xQAAjQqGVSZ_v6dnHcBAh4E",
-                "CAACAgUAAxkBAAEDEUlpELMtuNylK7QjdXa5nJ4gu7jmpQACOhIAAu2hGFSHUfVI4iDv1B4E",
-                "CAACAgUAAxkBAAEDEWBpENkDjJKURsmGGczvtcohKGbG5AACpBMAAri5GFQLR04rcZF4aR4E",
-                "CAACAgUAAxkBAAEDEWNpENkyCxgpX0bl3vswPhPNqZgEkwACRxcAAtw7OFQ80i_ZR3oo2h4E"
-            ]
-        };
-        const API_URLS = { 30: 'https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json', 60: 'https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json', 180: 'https://draw.ar-lottery01.com/WinGo/WinGo_3M/GetHistoryIssuePage.json', 300: 'https://draw.ar-lottery01.com/WinGo/WinGo_5M/GetHistoryIssuePage.json' };
-
-        let app = { 
-            active: false, timer: 30, lastPeriod: null, prediction: null, profit: 0, 
-            predCount: 0, limit: 0, currentGame: GAMES[0].name, mainServer: 'JAVA', subServer: 'A', 
-            lossStreak: 0, username: "USER", userPic: "", botHistory: [], connected: false,
-            periodsToSkip: 0, alternatingLossStreak: 0, lastTgMsgId: null, baseBet: 10
-        };
-        let loopInterval, graphInterval;
-        let selectedRating = 0;
-
-        window.onload = () => { loadCfg(); initSlider(); loadProfile(); updateStats(); startLiveFeed(); };
-
-        // --- NEW LIVE FEED FUNCTION ---
-        const FEED_DATA = [
-            {type:'win', user:'Arjun***88', amt:5400}, {type:'msg', user:'Karan***12', txt:'Loss covered! Thx Rao Sahab'},
-            {type:'win', user:'Priya***22', amt:1200}, {type:'msg', user:'Vikram***99', txt:'Best bot for Daman'},
-            {type:'win', user:'Rahul***05', amt:8500}, {type:'win', user:'Sneha***11', amt:500},
-            {type:'msg', user:'Amit***44', txt:'Titanium server OP!'}, {type:'win', user:'Dev***77', amt:3000},
-            {type:'win', user:'Rohan***21', amt:15000}, {type:'msg', user:'Simran***00', txt:'Recovered 10k today'},
-            {type:'win', user:'Vivek***33', amt:900}, {type:'win', user:'Manish***55', amt:450},
-            {type:'msg', user:'Pooja***66', txt:'M-9 server is working good'}, {type:'win', user:'Sameer***89', amt:2200}
-        ];
-
-        function startLiveFeed() {
-            const list = document.getElementById('feedList');
-            setInterval(() => {
-                const item = FEED_DATA[Math.floor(Math.random() * FEED_DATA.length)];
-                const div = document.createElement('div');
-                div.className = 'feed-item';
-                if(item.type === 'win') {
-                    div.innerHTML = `<span class="feed-user">${item.user}</span> just won <span class="feed-win">₹${item.amt}</span>`;
-                } else {
-                    div.innerHTML = `<span class="feed-user">${item.user}:</span> ${item.txt}`;
-                }
-                list.prepend(div);
-                if(list.children.length > 5) list.lastElementChild.remove();
-            }, 2500); 
-        }
-
-        function loadProfile() {
-            const name = localStorage.getItem('rao_name') || 'RAO SAHAB';
-            const pic = localStorage.getItem('rao_pic');
-            document.getElementById('headerName').innerText = name.toUpperCase();
-            document.getElementById('profileName').innerText = name.toUpperCase();
-            document.getElementById('inputNewName').value = name;
-            if(pic) {
-                document.getElementById('headerAvatar').style.backgroundImage = `url('${pic}')`;
-                document.getElementById('settingsAvatar').style.backgroundImage = `url('${pic}')`;
-            } else {
-                const def = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-                document.getElementById('headerAvatar').style.backgroundImage = `url('${def}')`;
-                document.getElementById('settingsAvatar').style.backgroundImage = `url('${def}')`;
-            }
-        }
-
-        function processImage(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 100;
-                    canvas.height = 100;
-                    ctx.drawImage(img, 0, 0, 100, 100);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    localStorage.setItem('rao_pic', dataUrl);
-                    loadProfile();
-                    showToast("PROFILE PIC UPDATED!");
-                }
-            }
-            reader.readAsDataURL(file);
-        }
-
-        function manualUpdateProfile() { const name = document.getElementById('inputNewName').value; if(name) { localStorage.setItem('rao_name', name); loadProfile(); showToast("PROFILE UPDATED"); } }
-        function removePhoto() { localStorage.removeItem('rao_pic'); loadProfile(); showToast("PHOTO REMOVED"); }
-        function updateStats() { 
-            document.getElementById('displayProfit').innerText = `₹${Math.floor(app.profit)}`;
-            let w = (app.profit / 5000) * 100; if(w>100) w=100; if(w<0) w=0;
-            document.getElementById('targetBar').style.width = w + "%"; 
-        }
-
-        function initSlider() { document.getElementById('gameSlider').innerHTML = GAMES.map((g,i) => `<div class="slide-card" onclick="loadGame(${i})"><img src="${g.img}" class="slide-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1168/1168582.png'"><div class="slide-overlay">${g.name}</div></div>`).join(''); }
-        
-        function loadGame(i) {
-            app.currentGame = GAMES[i].name;
-            app.connected = true;
-            Swal.fire({ toast: true, position: 'top', icon: 'success', title: `CONNECTED TO ${app.currentGame}`, showConfirmButton: false, timer: 1500, background: '#000', color: '#00ff41' });
-            document.getElementById('gameFrame').src = GAMES[i].link;
-            switchTab('tabGame', document.querySelectorAll('.nav-item')[1]);
-            document.getElementById('srvConnectMsg').innerText = "SYSTEM ACTIVE";
-            document.getElementById('srvConnectMsg').style.color = "var(--theme-color)";
-            document.getElementById('srvConnectMsg').style.display = "block";
-            document.getElementById('serverStatusDisplay').innerText = `SERVER: ONLINE (${app.mainServer})`;
-            document.getElementById('serverStatusDisplay').style.color = "#00ff41";
-            
-            if(loopInterval) clearInterval(loopInterval);
-            if(graphInterval) clearInterval(graphInterval);
-            loopInterval = setInterval(loop, 1000);
-            graphInterval = setInterval(updateRealGraphs, 2000);
-            updateRealGraphs(); 
-        }
-
-        function setTheme(c) { document.documentElement.style.setProperty('--theme-color', c); localStorage.setItem('theme_color_v24', c); document.documentElement.style.setProperty('--border', `1px solid ${c}`); }
-        
-        let flowerInterval;
-        function initFlowerRain() {
-            if(document.getElementById('flowerSwitch') && document.getElementById('flowerSwitch').checked) {
-                toggleFlowers();
-            }
-        }
-
-        function toggleFlowers() {
-            const on = document.getElementById('flowerSwitch').checked;
-            const container = document.getElementById('flowerContainer');
-            if(on) {
-                container.style.display = 'block';
-                if(flowerInterval) clearInterval(flowerInterval);
-                flowerInterval = setInterval(createFlower, 400); 
-            } else {
-                container.style.display = 'none';
-                clearInterval(flowerInterval);
-                container.innerHTML = '';
-            }
-        }
-
-        function createFlower() {
-            const l = document.getElementById('flowerContainer');
-            const flowers = ['🌸','🌹','🌻','🌷','🌼'];
-            const f = document.createElement('div');
-            f.className = 'flower';
-            f.innerText = flowers[Math.floor(Math.random()*flowers.length)];
-            f.style.left = Math.random()*100 + 'vw';
-            f.style.animationDuration = Math.random()*3+3 + 's';
-            l.appendChild(f);
-            setTimeout(()=>f.remove(), 6000);
-        }
-
-        function toggleHardDisco() {
-            const on = document.getElementById('hardDiscoSwitch').checked;
-            if(on) document.body.classList.add('hard-disco-active');
-            else document.body.classList.remove('hard-disco-active');
-        }
-
-        function rate(n) {
-            selectedRating = n;
-            document.querySelectorAll('.star').forEach((s, i) => {
-                if(i < n) s.classList.add('selected'); else s.classList.remove('selected');
-            });
-        }
-        function sendFeedback() {
-            if(selectedRating === 0) return showToast("SELECT STARS FIRST");
-            const msg = document.getElementById('feedMsg').value;
-            const finalTxt = `🌟 RATING: ${selectedRating}/5 \n👤 USER: ${document.getElementById('headerName').innerText}\n💬 MESSAGE: ${msg}`;
-            const url = `https://t.me/RAOPAPAJI?text=${encodeURIComponent(finalTxt)}`;
-            window.open(url, '_blank');
-        }
-
-        async function updateRealGraphs() {
-            if(!app.connected) return;
-            try { 
-                const res = await fetch(`${API_URLS[app.timer]}?ts=${Date.now()}`); 
-                const data = (await res.json()).data.list; 
-                if(!data) return;
-
-                setMeter('meterStab', 'txtStab', Math.floor(Math.random()*20 + 70)); 
-                setMeter('meterTrend', 'txtTrend', Math.floor(Math.random()*20 + 70)); 
-                setMeter('meterPower', 'txtPower', 99);
-                
-                document.getElementById('accM9').innerText = Math.floor(Math.random() * (99 - 95) + 95) + "%";
-                document.getElementById('accAI').innerText = Math.floor(Math.random() * (99 - 96) + 96) + "%";
-
-                document.querySelectorAll('.ball-item').forEach(b=>b.classList.remove('active'));
-                const lastNum = parseInt(data[0].number);
-                document.getElementById('ball-'+lastNum).classList.add('active');
-
-                let counts = Array(10).fill(0);
-                data.slice(0, 50).forEach(x => counts[parseInt(x.number)]++);
-                const maxVal = Math.max(...counts);
-                const bestNum = counts.indexOf(maxVal);
-
-                document.getElementById('numGraphBox').innerHTML = counts.map((c, i) => {
-                    let h = (c / maxVal) * 100; if(h < 15) h = 15;
-                    let isLocked = (i !== bestNum && h < 50); let isHot = (i === bestNum);
-                    let barClass = 'num-bar'; if(isHot) barClass += ' hot'; else if(isLocked) barClass += ' locked';
-                    return `<div class="num-bar-col"><div class="num-bar-val">${c}</div><div class="${barClass}" style="height:${isLocked?20:h}%;"></div><div class="num-bar-label">${i}</div></div>`;
-                }).join('');
-            } catch(e){ console.log("API ERROR: " + e); }
-        }
-
-        function setMeter(cid, tid, val) { const c = document.getElementById(cid); const o = (2 * Math.PI * 28) * (1 - val/100); c.style.strokeDashoffset = o; document.getElementById(tid).innerText = val + "%"; }
-        
-        function selMain(id, el) { 
-            document.querySelectorAll('.srv-btn').forEach(b => b.classList.remove('active')); 
-            document.querySelectorAll('.em-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active'); 
-            
-            if(id === 1) app.mainServer = "TITANIUM";
-            if(id === 2) app.mainServer = "MATRIX";
-            if(id === 3) app.mainServer = "JAVA";
-            if(id === 4) app.mainServer = "M-9";
-            if(id === 5) app.mainServer = "AI PRO";
-
-            const msg = document.getElementById('srvConnectMsg');
-            msg.style.display = 'block'; msg.innerText = "CONNECTING..."; msg.style.color = "#fff";
-            setTimeout(() => { 
-                msg.innerText = `CONNECTED: ${app.mainServer}`; 
-                msg.style.color = "var(--theme-color)"; 
-                showToast(`SERVER SWITCHED TO ${app.mainServer}`); 
-                document.getElementById('serverStatusDisplay').innerText = "SERVER: ONLINE (" + app.mainServer + ")";
-                document.getElementById('serverStatusDisplay').style.color = "#00ff41";
-            }, 1000);
-        }
-        
-        function selSub(id, el) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); app.subServer = id; }
-        
-        function setTimer(s, el) { 
-            app.timer = s; 
-            document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active')); 
-            el.classList.add('active'); 
-            if(app.connected) updateRealGraphs();
-        }
-
-        function togEmergency() {
-            const on = document.getElementById('emergencySwitch').checked;
-            document.getElementById('emergencyBox').style.display = on ? 'block' : 'none';
-            if(!on && (app.mainServer === 'M-9' || app.mainServer === 'AI PRO')) {
-                selMain(1, document.getElementById('btnTitanium'));
-            }
-        }
-
-        // ==========================================
-        // V.52 ULTIMATE LOGIC (MATH UPDATE)
-        // ==========================================
-        const BIG_NUMBERS = [5, 6, 7, 8, 9];
-        const SMALL_NUMBERS = [0, 1, 2, 3, 4];
-
-        function getBigSmall(number) {
-            let n = parseInt(number);
-            if(isNaN(n)) return "SMALL";
-            return (n >= 5) ? "BIG" : "SMALL";
-        }
-
-        // --- NEW: JAVA MATH LOGIC (CONVERTED FROM YOUR CODE) ---
-        function calculateJavaPrediction(list) {
-            let historyStr = "";
-            // Reverse so index 0 is oldest, end is newest (like standard history string)
-            const subset = list.slice(0, 20).reverse();
-            
-            subset.forEach(item => {
-                let n = parseInt(item.number);
-                historyStr += (n >= 5) ? "B" : "A"; // B=Big, A=Small
-            });
-
-            const n = historyStr.length;
-            if (n < 3) return { action: "Skip", skipReason: "NEED DATA" };
-
-            let lookback = Math.min(10, n);
-            let last = historyStr.substring(n - lookback);
-
-            let countA = 0, countB = 0;
-            for (let c of last) {
-                if (c === 'A') countA++;
-                if (c === 'B') countB++;
-            }
-
-            let scoreA = 0;
-            let scoreB = 0;
-
-            // ===== RULE 1: STREAK =====
-            let streak = 1;
-            for (let i = n - 1; i > 0; i--) {
-                if (historyStr[i] === historyStr[i - 1]) streak++;
-                else break;
-            }
-            if (streak >= 3) {
-                // Java Code: if (last == 'A') scoreB += 40; else scoreA += 40;
-                // Meaning: Bet against the streak (Dragon Break)
-                if (historyStr[n - 1] === 'A') scoreB += 40;
-                else scoreA += 40;
-            }
-
-            // ===== RULE 2: MAJORITY REVERSE =====
-            if (countA > countB) scoreB += 25;
-            else if (countB > countA) scoreA += 25;
-
-            // ===== RULE 3: ALTERNATION =====
-            let alt = true;
-            let checkLen = last.length;
-            for (let i = checkLen - 1; i > checkLen - 6 && i > 0; i--) {
-                if (last[i] === last[i - 1]) {
-                    alt = false;
-                    break;
-                }
-            }
-            if (alt && checkLen >= 6) {
-                // If alternating (ABAB), continue alternation
-                // If last was A, bet B.
-                if (historyStr[n - 1] === 'A') scoreB += 20;
-                else scoreA += 20;
-            }
-
-            // ===== RULE 4: VOLATILITY =====
-            if (Math.abs(countA - countB) >= 4) {
-                if (countA > countB) scoreB += 15;
-                else scoreA += 15;
-            }
-
-            // Result
-            let predictionChar = scoreA > scoreB ? 'A' : 'B';
-            let confidence = (Math.max(scoreA, scoreB) / 100.0) * 100;
-            let pick = (predictionChar === 'B') ? 'BIG' : 'SMALL';
-            
-            // Generate a random number for that size for display
-            let num = (pick === "BIG") ? Math.floor(Math.random()*5)+5 : Math.floor(Math.random()*5);
-
-            if (confidence < 60 && document.getElementById('safeModeSwitch').checked) {
-                return { action: "Skip", skipReason: "LOW CONFIDENCE" };
-            }
-
-            return { action: "Predict", predictedSize: pick, predictedNumber: num, confidence: confidence };
-        }
-
-        // --- TITANIUM SERVER (Improved) ---
-        function getTitaniumPrediction(history) {
-            // Keep Titanium slightly random but weighted by trend
-            let b = 0, s = 0;
-            for(let i=0; i<6; i++) {
-                if(getBigSmall(history[i].number) === "BIG") b++; else s++;
-            }
-            let res = (b > s) ? "BIG" : "SMALL"; // Follow Trend
-            let num = (res === "BIG") ? Math.floor(Math.random()*5)+5 : Math.floor(Math.random()*5);
-            return { action: "Predict", predictedSize: res, predictedNumber: num, confidence: 80 };
-        }
-
-        // --- JAVA SERVER (NOW USES PURE MATH) ---
-        function getJavaPrediction(history) {
-            return calculateJavaPrediction(history);
-        }
-
-        // --- EMERGENCY M-9 (NOW USES MATH TOO) ---
-        function getM9Prediction(history) {
-            // M9 uses Java logic but is more aggressive (lower threshold)
-            let result = calculateJavaPrediction(history);
-            if(result.action === "Skip") {
-                // Force a prediction based on last result if Math skips
-                let lastSize = getBigSmall(history[0].number);
-                let num = (lastSize === "BIG") ? Math.floor(Math.random()*5)+5 : Math.floor(Math.random()*5);
-                return { action: "Predict", predictedSize: lastSize, predictedNumber: num, confidence: 60 };
-            }
-            result.confidence = 99; // Boost confidence for M9 display
-            return result;
-        }
-
-        async function processPrediction() {
-            if(!app.connected) return;
-            if(app.limit > 0 && app.predCount >= app.limit) { toggleSession(); showToast("LIMIT REACHED"); return; }
-            
-            try {
-                const res = await fetch(`${API_URLS[app.timer]}?ts=${Date.now()}`);
-                const data = await res.json();
-                const list = data.data.list;
-                const nextIssue = (BigInt(list[0].issueNumber)+1n).toString();
-                
-                if(app.lastPeriod === nextIssue) return;
-                app.lastPeriod = nextIssue; 
-
-                updatePatternVis(list);
-                const historyForAI = list.slice(0, 50); // Need recent history
-                
-                let prediction = { action: "Skip", skipReason: "Loading..." };
-                let usedLogic = "TITANIUM";
-
-                if (app.mainServer === 'TITANIUM') {
-                    prediction = getTitaniumPrediction(historyForAI);
-                } else if (app.mainServer === 'MATRIX') {
-                    // Matrix reverses Titanium
-                    let t = getTitaniumPrediction(historyForAI);
-                    prediction = { ...t, predictedSize: (t.predictedSize==="BIG"?"SMALL":"BIG") };
-                    usedLogic = "MATRIX V2";
-                } else if (app.mainServer === 'JAVA') {
-                    prediction = getJavaPrediction(historyForAI);
-                    usedLogic = "JAVA MATH";
-                } else if (app.mainServer === 'M-9') {
-                    prediction = getM9Prediction(historyForAI);
-                    usedLogic = "M-9 SENTINEL";
-                } else if (app.mainServer === 'AI PRO') {
-                    prediction = getJavaPrediction(historyForAI); // AI Pro also uses Math now
-                    usedLogic = "AI PRO (AUTO)";
-                }
-
-                // --- FUND MANAGEMENT UPDATE ---
-                let betAmt = app.baseBet * Math.pow(3, app.lossStreak);
-                let levelText = `LEVEL ${app.lossStreak + 1} (₹${betAmt})`;
-                if(app.lossStreak === 0) levelText = `START - LEVEL 1 (₹${app.baseBet})`;
-                document.getElementById('fundText').innerText = levelText;
-
-                let displayValue = "WAIT";
-                let statusClass = "wait";
-                let coldTxt = "ANALYZING...";
-
-                if(prediction.action === "Skip") {
-                    displayValue = "SKIP";
-                    statusClass = "skip";
-                    coldTxt = "RISK: " + prediction.skipReason;
-                    app.prediction = { period: nextIssue, value: "SKIP", status: 'SKIPPED', confidence: 0 };
-                    
-                    // Alert for Skip
-                    document.getElementById('resultText').innerText = "SKIP";
-                    document.getElementById('resultText').className = "result-display skip";
-                    document.getElementById('coldNumDisplay').innerText = "HIGH RISK PATTERN";
-                    
-                } else if(prediction.action === "Predict") {
-                    displayValue = prediction.predictedSize;
-                    
-                    // --- SMART COLD NUMBER LOGIC ---
-                    if(document.getElementById('coldSwitch').checked) {
-                        let counts = Array(10).fill(0);
-                        list.slice(0, 50).forEach(x => counts[parseInt(x.number)]++);
-                        let rangeStart = (displayValue === "BIG") ? 5 : 0;
-                        let rangeEnd = (displayValue === "BIG") ? 10 : 5;
-                        
-                        let minVal = 100;
-                        let coldNum = -1;
-                        for(let i=rangeStart; i<rangeEnd; i++) {
-                            if(counts[i] < minVal) { minVal = counts[i]; coldNum = i; }
-                        }
-                        if(coldNum !== -1) {
-                            coldTxt = `COLD: ${coldNum}`;
-                            document.querySelectorAll('.ball-item').forEach(b => b.classList.remove('cold-active'));
-                            document.getElementById('ball-'+coldNum).classList.add('cold-active');
-                        }
-                    }
-
-                    let safeNum = prediction.predictedNumber;
-                    if(displayValue === "BIG" && safeNum < 5) safeNum += 5;
-                    if(displayValue === "SMALL" && safeNum >= 5) safeNum -= 5;
-                    prediction.predictedNumber = safeNum;
-
-                    statusClass = (displayValue === "BIG") ? "big" : "small";
-                    
-                    if(document.getElementById('colorSwitch').checked) {
-                        displayValue = (displayValue === "BIG") ? "🟢 GREEN" : "🔴 RED";
-                    }
-                    if(document.getElementById('reverseSwitch').checked) {
-                         if(document.getElementById('colorSwitch').checked) {
-                             displayValue = (displayValue.includes("GREEN")) ? "🔴 RED" : "🟢 GREEN";
-                             statusClass = (statusClass === "big") ? "small" : "big";
-                         } else {
-                             displayValue = (displayValue === "BIG") ? "SMALL" : "BIG";
-                             statusClass = (displayValue === "BIG") ? "small" : "big";
-                         }
-                    }
-
-                    app.prediction = { 
-                        period: nextIssue, 
-                        value: (statusClass === "big") ? "BIG" : "SMALL", 
-                        status: 'PENDING', 
-                        confidence: prediction.confidence 
-                    }; 
-                    
-                    document.getElementById('resultText').className = `result-display ${statusClass}`;
-                    document.getElementById('resultText').innerText = displayValue;
-                    document.getElementById('targetDisplay').innerText = usedLogic;
-                    
-                    const cd = document.getElementById('coldNumDisplay');
-                    cd.style.display='block'; cd.innerText = coldTxt;
-
-                    if(document.getElementById('aiGlowSwitch').checked) {
-                        document.getElementById('resultText').classList.add('ai-glow');
-                        const ov = document.getElementById('aiOverlay');
-                        ov.style.display='block';
-                        ov.className = `ai-overlay ${statusClass === 'big' ? 'active-win' : 'active-loss'}`;
-                        setTimeout(()=>ov.style.display='none', 4000);
-                    }
-                    
-                    if(document.getElementById('soundSwitch').checked) document.getElementById('alertSound').play();
-                    if(document.getElementById('tgSwitch').checked) sendTgMessage(nextIssue, displayValue, coldTxt);
-                }
-
-                app.predCount++;
-                app.botHistory.unshift({ period: nextIssue, pred: displayValue, result: '?', status: 'WAIT' });
-                updateHistoryTable();
-                document.getElementById('periodNum').innerText = nextIssue.slice(-5);
-
-            } catch(e) { console.log("FETCH ERR", e); }
-        }
-
-        async function checkResult() {
-            if(!app.prediction || app.prediction.status !== 'PENDING') return;
-            try {
-                const res = await fetch(`${API_URLS[app.timer]}?ts=${Date.now()}`);
-                const list = (await res.json()).data.list;
-                const r = list.find(x => x.issueNumber === app.prediction.period);
-                if(r) {
-                    const actualNum = parseInt(r.number);
-                    const actualSize = actualNum >= 5 ? "BIG" : "SMALL";
-                    
-                    let userPlayed = app.prediction.value; 
-                    if(document.getElementById('colorSwitch').checked) {
-                         // Simplify for logic check
-                         userPlayed = (userPlayed.includes("GREEN")) ? "BIG" : "SMALL";
-                    }
-
-                    const win = actualSize === userPlayed;
-                    
-                    app.prediction.status = win ? 'WIN' : 'LOSS';
-                    app.botHistory[0].result = actualSize;
-                    app.botHistory[0].status = win ? 'WIN' : 'LOSS';
-                    updateHistoryTable();
-
-                    if(win) { 
-                        app.profit += 100; app.lossStreak = 0; showPopup(true, r.number);
-                        if(document.getElementById('tgSwitch').checked) sendWinSequence(); 
-                    } else { 
-                        app.profit -= 50; app.lossStreak++; showPopup(false, r.number);
-                        
-                        // --- UPDATED LOSS LOGIC ---
-                        const isShortPred = document.getElementById('shortPredSwitch').checked;
-                        if(document.getElementById('tgSwitch').checked && !isShortPred) {
-                             sendStickerRaw(ASSETS.LOSS[Math.floor(Math.random()*ASSETS.LOSS.length)]);
-                        }
-                        // If Short Pred ON, we delete the message
-                        if(isShortPred && app.lastTgMsgId) {
-                            deleteTgMessage(app.lastTgMsgId);
-                        }
-                    }
-                    updateStats();
-                }
-            } catch(e) {}
-        }
-        
-        function updateHistoryTable() {
-            const t = document.getElementById('historyTable');
-            t.innerHTML = app.botHistory.map(h => {
-                const color = h.status === 'WIN' ? 'var(--theme-color)' : (h.status === 'LOSS' ? 'var(--red)' : '#fff');
-                return `<tr>
-                    <td style="border-bottom:1px solid #333; padding:8px;">${h.period.slice(-5)}</td>
-                    <td style="border-bottom:1px solid #333;">${h.pred}</td>
-                    <td style="border-bottom:1px solid #333;">${h.result}</td>
-                    <td style="border-bottom:1px solid #333; color:${color}; font-weight:900;">${h.status}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        function showPopup(win, num) {
-            const p = document.getElementById('resultPopup');
-            const t = document.getElementById('popTitle');
-            const n = document.getElementById('popNum');
-            p.className = win ? 'win-mode' : 'loss-mode';
-            t.innerText = win ? 'WIN 🏆' : 'LOSS 💔';
-            n.innerText = num;
-            p.style.display = 'flex'; setTimeout(() => { p.style.display='none'; }, 3000);
-        }
-
-        async function loop() {
-            const rem = app.timer - (new Date().getSeconds() % app.timer);
-            document.getElementById('timer').innerText = `00:${rem<10?'0'+rem:rem}`;
-            if(app.active && app.connected) { 
-                if(rem === (app.timer==30?29:59)) processPrediction(); 
-                if(rem <= 5) checkResult(); 
-            }
-        }
-
-        function togDJ() {
-            const on = document.getElementById('djSwitch').checked;
-            if(on) document.body.classList.add('disco-active');
-            else document.body.classList.remove('disco-active');
-        }
-
-        async function sendWinSequence() { 
-            const t=document.getElementById('botToken').value, c=document.getElementById('chatId').value;
-            if(!t || !c) return;
-            await sendStickerRaw(ASSETS.WIN_FIRST);
-            await new Promise(r => setTimeout(r, 1000));
-            // Send random middle sticker
-            await sendStickerRaw(ASSETS.WIN_MIDDLE[Math.floor(Math.random()*ASSETS.WIN_MIDDLE.length)]);
-            await new Promise(r => setTimeout(r, 1000));
-            await sendStickerRaw(ASSETS.WIN_LAST);
-        }
-        async function sendTgMessage(period, pred, cold) {
-            const t = document.getElementById('botToken').value, c = document.getElementById('chatId').value;
-            if(!t || !c) return;
-            const imgUrl = (app.timer === 30) ? ASSETS.IMG_30 : ASSETS.IMG_60;
-            let msg = `█▓▒░✧✦ WΣLCØMΣ ✦✧░▒▓█\n╔═◈═◈═◈═◈═◈═╗\nDate : ${new Date().toLocaleDateString()}\nGame : ${app.currentGame}\nWingo : ${app.timer/60}Min\nPeriod No : ${period.slice(-4)}\n╚═◈═◈═◈═◈═◈═╝\n𝗥𝗘𝗦𝗨𝗟𝗧 𝗜𝗡𝗙𝗢\nPrediction : ➨ ${pred}\n${cold}\n`;
-            if(document.getElementById('tagSwitch').checked) msg += `\n${document.getElementById('inpTags').value}`;
-            if(document.getElementById('giftSwitch').checked) msg += `\n🎁 *Code:* ${document.getElementById('inpGift').value}`;
-            if(document.getElementById('invSwitch').checked) msg += `\n🔗 *Link:* ${document.getElementById('inpInvite').value}`;
-            msg += `\n──────✦✧✦──────\n✦ Share Channel ✦\nREPRESENTED BY 亗ᎡᎪØ  ꕶᎪᎻᎪᏴ  𒆜×͜×`;
-            let markup = {};
-            if(document.getElementById('chSwitch').checked && document.getElementById('inpChannel').value) { markup = { inline_keyboard: [[{ text: "🚀 JOIN OFFICIAL CHANNEL", url: document.getElementById('inpChannel').value }]] }; }
-            try { 
-                const url = `https://api.telegram.org/bot${t}/sendPhoto?chat_id=${c}&photo=${imgUrl}&caption=${encodeURIComponent(msg)}&parse_mode=Markdown`;
-                const r1 = await fetch(url);
-                const r1d = await r1.json();
-                if(r1d.ok) {
-                    app.lastTgMsgId = r1d.result.message_id; 
-                }
-                if(markup.inline_keyboard) { await fetch(`https://api.telegram.org/bot${t}/editMessageCaption?chat_id=${c}&message_id=${r1d.result.message_id}&caption=${encodeURIComponent(msg)}&parse_mode=Markdown&reply_markup=${encodeURIComponent(JSON.stringify(markup))}`); }
-            } catch(e){}
-        }
-        
-        async function deleteTgMessage(msgId) {
-            const t=document.getElementById('botToken').value, c=document.getElementById('chatId').value;
-            if(!t || !c || !msgId) return;
-            try {
-                await fetch(`https://api.telegram.org/bot${t}/deleteMessage?chat_id=${c}&message_id=${msgId}`);
-            } catch(e) { console.log("Del Err", e); }
-        }
-        
-        async function sendStickerRaw(id) { const t=document.getElementById('botToken').value, c=document.getElementById('chatId').value; if(t && c) try { await fetch(`https://api.telegram.org/bot${t}/sendSticker?chat_id=${c}&sticker=${id}`); } catch(e){} }
-        async function sendTgPhoto(caption, url) { const t = document.getElementById('botToken').value, c = document.getElementById('chatId').value; if(t && c) try { await fetch(`https://api.telegram.org/bot${t}/sendPhoto?chat_id=${c}&photo=${url}&caption=${encodeURIComponent(caption)}`); } catch(e){} }
-        
-        async function sendTgText(text) { const t = document.getElementById('botToken').value, c = document.getElementById('chatId').value; if(t && c) try { await fetch(`https://api.telegram.org/bot${t}/sendMessage?chat_id=${c}&text=${encodeURIComponent(text)}&parse_mode=Markdown`); } catch(e){} }
-
-        async function toggleSession() { 
-            if(!app.connected) return Swal.fire({ icon: 'error', title: 'SELECT GAME FIRST', text: 'Click on a game logo above', background: '#000', color: '#fff' });
-            app.active = !app.active; 
-            document.getElementById('sessionBtn').innerHTML = app.active ? '<i class="fas fa-stop"></i> STOP' : '<i class="fas fa-rocket"></i> START'; 
-            document.getElementById('sessionBtn').classList.toggle('btn-stop'); 
-            if(app.active) {
-                app.predCount = 0;
-                if(document.getElementById('tgSwitch').checked) {
-                    if(document.getElementById('instrSwitch').checked) {
-                        await sendTgText(INSTRUCTION_MSG);
-                        await new Promise(r => setTimeout(r, 1000));
-                    }
-                    sendTgPhoto("🚀 *SESSION STARTED* \n\nGood Luck!", ASSETS.START);
-                }
-            } else {
-                if(document.getElementById('tgSwitch').checked) sendTgPhoto("🛑 *SESSION STOPPED*", ASSETS.STOP);
-                
-                // --- AUTO DELETE FEATURE ON STOP ---
-                if(document.getElementById('shortPredSwitch').checked && app.lastTgMsgId) {
-                     deleteTgMessage(app.lastTgMsgId);
-                }
-            }
-        }
-        function tog(id) { const e=document.getElementById(id); e.style.display = e.style.display==='block'?'none':'block'; }
-        function togProfit() { document.getElementById('profitBox').style.display = document.getElementById('profitSwitch').checked ? 'block':'none'; }
-        function togRGB() { const on = document.getElementById('rgbSwitch').checked; const el = document.getElementById('rgbBorder'); if(on) el.classList.add('active'); else el.classList.remove('active'); }
-        
-        function switchTab(t, el) { document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(t).classList.add('active'); if(el) { document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); el.classList.add('active'); } }
-        function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
-        function saveCfg() { localStorage.setItem('cfg_v26', JSON.stringify({ token: document.getElementById('botToken').value, chat: document.getElementById('chatId').value, limit: document.getElementById('inpLimit').value, profitTog: document.getElementById('profitSwitch').checked, aiGlow: document.getElementById('aiGlowSwitch').checked, rgb: document.getElementById('rgbSwitch').checked, dj: document.getElementById('djSwitch').checked, cold: document.getElementById('coldSwitch').checked, sound: document.getElementById('soundSwitch').checked, color: document.getElementById('colorSwitch').checked, season: document.getElementById('seasonSwitch').checked, tags: document.getElementById('inpTags').value, gift: document.getElementById('inpGift').value, invite: document.getElementById('inpInvite').value, chLink: document.getElementById('inpChannel').value, chTog: document.getElementById('chSwitch').checked, reverse: document.getElementById('reverseSwitch').checked, feedTog: document.getElementById('feedSwitch').checked, safeMode: document.getElementById('safeModeSwitch').checked, emergency: document.getElementById('emergencySwitch').checked, shortPred: document.getElementById('shortPredSwitch').checked, instr: document.getElementById('instrSwitch').checked })); app.limit = parseInt(document.getElementById('inpLimit').value) || 0; showToast("CONFIG SAVED"); togDJ(); togEmergency(); }
-        function loadCfg() { const c = JSON.parse(localStorage.getItem('cfg_v26')||'{}'); if(c.token) document.getElementById('botToken').value = c.token; if(c.chat) document.getElementById('chatId').value = c.chat; if(c.limit) document.getElementById('inpLimit').value = c.limit; if(c.tags) document.getElementById('inpTags').value = c.tags; if(c.gift) document.getElementById('inpGift').value = c.gift; if(c.invite) document.getElementById('inpInvite').value = c.invite; if(c.chLink) document.getElementById('inpChannel').value = c.chLink; if(c.chTog) { document.getElementById('chSwitch').checked = true; tog('inpChannel'); } if(c.profitTog) { document.getElementById('profitSwitch').checked=true; togProfit(); } if(c.aiGlow) document.getElementById('aiGlowSwitch').checked = true; if(c.rgb) { document.getElementById('rgbSwitch').checked=true; togRGB(); } if(c.dj) { document.getElementById('djSwitch').checked=true; togDJ(); } if(c.cold) document.getElementById('coldSwitch').checked=true; if(c.sound) document.getElementById('soundSwitch').checked=true; if(c.color) document.getElementById('colorSwitch').checked=true; if(c.season) document.getElementById('seasonSwitch').checked=true; if(c.reverse) document.getElementById('reverseSwitch').checked=true; if(c.safeMode) document.getElementById('safeModeSwitch').checked=true; if(c.emergency) { document.getElementById('emergencySwitch').checked=true; togEmergency(); } if(c.feedTog) { document.getElementById('feedSwitch').checked = true; tog('feedBoxUi'); } if(c.shortPred) document.getElementById('shortPredSwitch').checked=true; if(c.instr) document.getElementById('instrSwitch').checked=true; const theme = localStorage.getItem('theme_color_v24'); if(theme) setTheme(theme); }
-        async function verifyChatId() { const t = document.getElementById('botToken').value, c = document.getElementById('chatId').value; try { await fetch(`https://api.telegram.org/bot${t}/sendMessage?chat_id=${c}&text=HELLO FROM RAO BOT`); alert("MESSAGE SENT"); } catch(e) { alert("ERROR"); } }
-
-    </script>
+        });
+    }
+}
+
+function toggleGame(){
+    is30Sec=!is30Sec;currentPrediction=null;currentPeriod=null;currentPredictedNumber=null;
+    document.getElementById('starSymbol').classList.toggle('thirty-sec',is30Sec);
+    document.getElementById('timerDisplay').classList.toggle('thirty-sec',is30Sec);
+    document.getElementById('periodNumber').textContent='Loading...';
+    document.getElementById('periodNumber').classList.add('loading');
+    fetchData();updateISTTimer();if(navigator.vibrate)navigator.vibrate(5);
+}
+
+async function fetchData(){
+    const period=document.getElementById('periodNumber');const timer=document.getElementById('timerDisplay');
+    try{const r=await fetch(is30Sec?API_30S:API_1M);const d=await r.json();
+    if(d.code===0&&d.data.list.length>0){const next=(BigInt(d.data.list[0].issueNumber)+1n).toString();period.textContent=next;period.classList.remove('loading');period.classList.add('updated');setTimeout(()=>period.classList.remove('updated'),300);timer.classList.add('fetching');setTimeout(()=>timer.classList.remove('fetching'),300);updatePrediction(d.data.list);if(navigator.vibrate)navigator.vibrate([30,20,30]);}}catch(e){console.error(e);period.textContent='Error';}
+}
+
+function updateISTTimer(){
+    const timer=document.getElementById('timerDisplay');const now=new Date();
+    const ist=new Date(now.getTime()+5.5*3600000+now.getTimezoneOffset()*60000);const sec=ist.getSeconds();let rem;
+    if(is30Sec){rem=sec<30?30-sec:60-sec;if((sec===0||sec===30)&&lastFetchedSecond!==sec){lastFetchedSecond=sec;setTimeout(fetchData,300);}}
+    else{rem=60-sec;if(rem===60)rem=60;if(sec===0&&lastFetchedSecond!==sec){lastFetchedSecond=sec;setTimeout(fetchData,300);}}
+    if(sec!==0&&sec!==30)lastFetchedSecond=-1;timer.textContent=rem;
+}
+fetchData();setInterval(updateISTTimer,1000);updateISTTimer();
+
+function switchTab(el){
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');
+    document.getElementById('pageTitleText').textContent=el.getAttribute('data-title');
+    document.getElementById('pageTitleIcon').innerHTML=icons[el.getAttribute('data-icon')];
+    document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));
+    document.getElementById(el.getAttribute('data-page')).classList.add('active');
+    if(el.getAttribute('data-page')==='historyPage'){setGameTypeFilter('30S');if(winFilterActive)toggleWinFilter();updateHistoryDisplay();}
+    const nav=document.getElementById('bottomNav'),container=document.getElementById('rippleContainer');
+    const nR=nav.getBoundingClientRect(),eR=el.getBoundingClientRect();
+    const rp=document.createElement('div');rp.className='water-ripple';rp.style.width='80px';rp.style.height='80px';
+    rp.style.left=(eR.left-nR.left+eR.width/2-40)+'px';rp.style.top=(eR.top-nR.top+eR.height/2-40)+'px';
+    container.appendChild(rp);setTimeout(()=>rp.remove(),800);
+    for(let i=0;i<3;i++){setTimeout(()=>{const b=document.createElement('div');b.className='bubble';const s=Math.random()*6+3;b.style.width=s+'px';b.style.height=s+'px';b.style.left=(eR.left-nR.left+eR.width/2+(Math.random()-.5)*20)+'px';b.style.top=(eR.top-nR.top+eR.height/2)+'px';nav.appendChild(b);requestAnimationFrame(()=>b.classList.add('pop'));setTimeout(()=>b.remove(),900);},i*60);}
+    if(navigator.vibrate)navigator.vibrate(8);
+}
+
+/* ══════════════════════════════════════════════════════
+   TELEGRAM API
+   ══════════════════════════════════════════════════════ */
+
+function showTelegramStatus(type,msg){const el=document.getElementById('telegramStatus');el.className='telegram-status '+type;el.textContent=msg;}
+function selectPreset(el,val){document.querySelectorAll('.win-preset').forEach(p=>p.classList.remove('selected'));el.classList.add('selected');document.getElementById('winCountInput').value=val;}
+function clearPresetSelection(){document.querySelectorAll('.win-preset').forEach(p=>p.classList.remove('selected'));}
+function openWinModal(){document.getElementById('winModal').classList.add('show');document.getElementById('winCountInput').value='';document.querySelectorAll('.win-preset').forEach(p=>p.classList.remove('selected'));}
+function closeWinModal(){document.getElementById('winModal').classList.remove('show');}
+
+async function sendTelegramMessage(text){
+    const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,text:text,disable_web_page_preview:false})});
+    const data=await res.json();if(!data.ok)throw new Error(data.description||'Send failed');return data;
+}
+async function sendTelegramPhoto(photoUrl,caption){
+    const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/sendPhoto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,photo:photoUrl,caption:caption||''})});
+    const data=await res.json();if(!data.ok)throw new Error(data.description||'Photo failed');return data;
+}
+async function sendTelegramSticker(stickerId){
+    const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/sendSticker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,sticker:stickerId})});
+    const data=await res.json();if(!data.ok)throw new Error(data.description||'Sticker failed');return data;
+}
+async function deleteTelegramMessage(msgId){
+    try{
+        const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/deleteMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,message_id:msgId})});
+        await res.json();
+    }catch(e){console.error('Delete err:',e);}
+}
+
+function updateBotCard(){
+    document.getElementById('botTotalSent').textContent=telegramTotalSent;
+    document.getElementById('botWinCount').textContent=telegramCurrentWins;
+    document.getElementById('botTargetWin').textContent=telegramTargetWins;
+}
+
+window.handleStartClick=function(){
+    const botToken=document.getElementById('botToken').value.trim();
+    const channelId=document.getElementById('channelId').value.trim();
+    if(!botToken||!channelId){showTelegramStatus('error','❌ Please enter both Bot Token and Channel ID');return;}
+    if(telegramBotActive){showTelegramStatus('info','ℹ️ Bot already running. Stop first.');return;}
+    telegramBotToken=botToken;telegramChannelId=channelId;
+    openWinModal();
+};
+
+window.confirmAndStart=async function(){
+    const winInput=document.getElementById('winCountInput').value.trim();
+    const targetWins=parseInt(winInput);
+    if(!targetWins||targetWins<1){document.getElementById('winCountInput').style.borderColor='#ef4444';setTimeout(()=>document.getElementById('winCountInput').style.borderColor='#e0e0e0',1500);return;}
+    closeWinModal();
+    telegramTargetWins=targetWins;telegramCurrentWins=0;telegramTotalSent=0;
+    telegramLastPeriod=null;originalStickerIndex=0;lastPredictionMsgId=null;
+    sessionStartTime=Date.now();
+    msgQueue=[];queueRunning=false;
+
+    showTelegramStatus('info','⏳ Verifying bot token...');
+    try{const vr=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/getMe');const vd=await vr.json();if(!vd.ok){showTelegramStatus('error','❌ Invalid Bot Token!');return;}}
+    catch(e){showTelegramStatus('error','❌ Network error.');return;}
+
+    showTelegramStatus('info','⏳ Starting session...');
+    telegramBotActive=true;
+    document.getElementById('startBotBtn').disabled=true;
+    document.getElementById('startBotBtn').textContent='● BOT RUNNING';
+    document.getElementById('botRunningCard').classList.add('show');
+    updateBotCard();
+
+    const istTime=getISTTimeString();
+    const caption='🚀 SESSION STARTED\n🎯 Target: '+targetWins+' Wins\n⏰ Time: '+istTime+'\n▰▰▰ ᴘᴏᴡᴇʀᴅ ʙʏ ᴀᴋᴇʟᴀ ʜᴀᴄᴋᴇʀ ▰▰▰';
+
+    /* QUEUE: session photo → session sticker → first prediction */
+    enqueue(async()=>{
+        try{await sendTelegramPhoto(PHOTO_URLS.SESSION_START,caption);}
+        catch(e){try{await sendTelegramMessage(caption);}catch(e2){showTelegramStatus('error','❌ Cannot send to channel.');telegramBotActive=false;document.getElementById('startBotBtn').disabled=false;document.getElementById('startBotBtn').textContent='▶ START BOT';document.getElementById('botRunningCard').classList.remove('show');return;}}
+    });
+    enqueue(()=>sendTelegramSticker(STICKER_IDS.SESSION_START));
+
+    if(currentPrediction&&currentPeriod){
+        telegramLastPeriod=currentPeriod;
+        const p=currentPeriod,pr=currentPrediction,n=currentPredictedNumber,c=currentConfidence;
+        const photo=getPredictionPhoto(pr,is30Sec);
+        const cap=buildPredictionCaption(p,pr,n,c);
+        enqueue(async()=>{
+            try{const result=await sendTelegramPhoto(photo,cap);lastPredictionMsgId=result.result.message_id;telegramTotalSent++;updateBotCard();}
+            catch(e){try{const result=await sendTelegramMessage(cap);lastPredictionMsgId=result.result.message_id;telegramTotalSent++;updateBotCard();}catch(e2){}}
+        });
+    }
+
+    showTelegramStatus('success','✅ Bot started! Sending predictions...');
+    if(navigator.vibrate)navigator.vibrate([50,30,50,30,100]);
+};
+
+/* ══════════ STOP BOT ══════════ */
+async function doStopBot(){
+    telegramBotActive=false;
+    const duration=Date.now()-sessionStartTime;
+    const durationStr=formatDuration(duration);
+    const endCaption='📊 SESSION COMPLETED\n✅ Wins: '+telegramCurrentWins+'/'+telegramTargetWins+'\n⏰ Duration: '+durationStr+'\n▰▰▰ ᴘᴏᴡᴇʀᴅ ʙʏ ᴀᴋᴇʟᴀ ᴛʀᴀᴅᴇʀ ▰▰▰';
+
+    /* Session end: STICKER first → then PHOTO */
+    try{await sendTelegramSticker(STICKER_IDS.SESSION_END);}catch(e){}
+    await sleep(100);
+    try{await sendTelegramPhoto(PHOTO_URLS.SESSION_END,endCaption);}catch(e){try{await sendTelegramMessage(endCaption);}catch(e2){}}
+
+    document.getElementById('startBotBtn').disabled=false;
+    document.getElementById('startBotBtn').textContent='▶ START BOT';
+    document.getElementById('botRunningCard').classList.remove('show');
+    showTelegramStatus('success','🛑 Bot stopped. Wins: '+telegramCurrentWins+'/'+telegramTargetWins);
+    if(navigator.vibrate)navigator.vibrate([100,50,200]);
+}
+
+window.stopTelegramBot=function(){
+    msgQueue=[];queueRunning=false;
+    enqueue(()=>doStopBot());
+};
+</script>
 </body>
-</html>
+    </html>
