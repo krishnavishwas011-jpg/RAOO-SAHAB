@@ -3,623 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinGo AI Predictor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <title>Rao Sahab VIP Bot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;min-height:100vh}
-        .page-title{position:fixed;top:15px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:500;color:#b0b0b8;letter-spacing:1.5px;z-index:100}
-        .page-title svg{width:20px;height:20px;fill:none;stroke:#b0b0b8;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-        .game-section{position:fixed;top:55px;left:25px;right:25px;bottom:80px;overflow-y:auto}
-        .long-box{width:100%;height:42px;background:#f5f5f5;border-radius:9999px;border:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;padding:5px 6px 5px 12px;gap:8px}
-        .star-symbol{font-size:18px;color:#8b5cf6;transition:all .15s ease}
-        .star-symbol.thirty-sec{color:#10b981}
-        .period-number{flex:1;font-size:15px;font-weight:700;color:#333;letter-spacing:.8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:all .2s ease}
-        .period-number.loading{color:#aaa;font-size:13px}
-        .period-number.updated{animation:flashUpdate .3s ease}
-        @keyframes flashUpdate{0%{opacity:.5;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
-        .timer-display{height:32px;min-width:44px;padding:0 12px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .15s ease;background:rgba(139,92,246,.1);color:#8b5cf6;border:2px solid #8b5cf6;-webkit-tap-highlight-color:transparent}
-        .timer-display:active{transform:scale(.95)}
-        .timer-display.thirty-sec{background:rgba(16,185,129,.1);color:#10b981;border-color:#10b981}
-        .timer-display.fetching{animation:pulse .3s ease-in-out}
-        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-        .prediction-display{margin-top:20px;text-align:center}
-        .prediction-line{display:flex;align-items:center;justify-content:center;gap:10px}
-        .prediction-text{font-family:"Luckiest Guy",cursive;font-size:60px;color:#8B5CF6;text-shadow:0 4px 12px rgba(139,92,246,.4);letter-spacing:2px;text-transform:uppercase;transition:all .2s ease;line-height:1.2}
-        .prediction-text.updated{animation:predPop .4s ease}
-        @keyframes predPop{0%{transform:scale(.7);opacity:.3}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-        .prediction-num{font-family:"Luckiest Guy",cursive;font-size:60px;letter-spacing:2px;transition:all .3s ease;line-height:1.2;text-shadow:0 4px 12px rgba(0,0,0,.15)}
-        .prediction-num.clr-green{color:#10b981;text-shadow:0 4px 12px rgba(16,185,129,.4)}
-        .prediction-num.clr-red{color:#ef4444;text-shadow:0 4px 12px rgba(239,68,68,.4)}
-        .prediction-num.clr-redviolet{background:linear-gradient(135deg,#ef4444,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none;filter:drop-shadow(0 4px 8px rgba(168,85,247,.35))}
-        .prediction-num.clr-greenviolet{background:linear-gradient(135deg,#10b981,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none;filter:drop-shadow(0 4px 8px rgba(168,85,247,.35))}
-        .prediction-num.updated{animation:predPop .45s ease}
-        .prediction-confidence{margin-top:12px;font-size:11px;font-weight:700;color:#b0b0b8;letter-spacing:1.5px;text-transform:uppercase}
-        .gauge-section{margin-top:25px;display:flex;justify-content:space-between;gap:15px;padding:0 10px}
-        .gauge-container{flex:1;display:flex;flex-direction:column;align-items:center}
-        .gauge{position:relative;width:60px;height:60px}
-        .gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
-        .gauge-bg{fill:none;stroke:#e8e8e8;stroke-width:7}
-        .gauge-fill{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1s ease-in-out,stroke .5s ease}
-        .gauge-fill.green{stroke:#10b981}.gauge-fill.red{stroke:#ef4444}.gauge-fill.purple{stroke:#8b5cf6}.gauge-fill.gray{stroke:#6b7280}
-        .gauge-glow{position:absolute;top:50%;left:50%;width:35px;height:35px;transform:translate(-50%,-50%);border-radius:50%;opacity:.25;filter:blur(10px);transition:all .5s ease}
-        .gauge-glow.green{background:#10b981}.gauge-glow.red{background:#ef4444}.gauge-glow.purple{background:#8b5cf6}.gauge-glow.gray{background:#6b7280}
-        @keyframes gaugePulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.25}50%{transform:translate(-50%,-50%) scale(1.3);opacity:.4}}
-        .gauge.high .gauge-glow{animation:gaugePulse 2s ease-in-out infinite}
-        .gauge-label{font-size:8px;font-weight:800;color:#999;text-transform:uppercase;letter-spacing:.6px;margin-top:5px}
-        .info-panel{margin-top:25px;display:flex;flex-direction:column;gap:12px}
-        .info-row{display:flex;justify-content:space-between;gap:12px}
-        .info-box{flex:1;min-height:70px;border-radius:18px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,.04);transition:transform .2s ease;border:1px solid rgba(0,0,0,.05)}
-        .info-box:active{transform:scale(.98)}
-        .info-label{font-size:18px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
-        .info-value{font-size:24px;font-weight:900}
-        .pass-box{background:linear-gradient(95deg,rgba(16,185,129,.25) 0%,#fff 85%)}.pass-box .info-label{color:#0a5e3c}.pass-box .info-value{color:#10b981}
-        .fail-box{background:linear-gradient(95deg,rgba(239,68,68,.2) 0%,#fff 85%)}.fail-box .info-label{color:#a13131}.fail-box .info-value{color:#ef4444}
-        .accuracy-box{background:linear-gradient(95deg,#d1d5db 0%,#fff 85%)}.accuracy-box .info-label{color:#1e293b}.accuracy-box .info-value{color:#0f172a;font-weight:900}
-        .bets-box{background:linear-gradient(95deg,rgba(168,85,247,.25) 0%,#fff 85%)}.bets-box .info-label{color:#6b21a8}.bets-box .info-value{color:#a855f7}
-        .home-credit{text-align:center;font-size:13px;font-weight:600;color:#888;letter-spacing:1px;text-transform:uppercase;margin-top:20px;margin-bottom:10px}
-        .home-credit span{color:#8B5CF6;font-weight:700}
-        .history-container{position:fixed;top:55px;left:15px;right:15px;bottom:80px;overflow-y:auto;padding:10px}
-        .history-header{display:flex;flex-direction:column;gap:12px;margin-bottom:15px}
-        .header-top{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
-        .history-title{font-size:16px;font-weight:700;color:#333}
-        .win-loss-badge{display:flex;gap:15px;background:#f0f0f5;padding:6px 18px;border-radius:40px;font-size:14px;font-weight:700}
-        .win-badge{color:#10b981}.lose-badge{color:#ef4444}
-        .filter-toggle{display:flex;background:#f0f0f0;border-radius:40px;padding:4px;width:fit-content;border:1px solid #ddd;gap:2px}
-        .filter-option{padding:8px 24px;font-size:14px;font-weight:700;border-radius:40px;cursor:pointer;transition:all .2s;color:#555;text-transform:uppercase;letter-spacing:.5px;user-select:none;white-space:nowrap}
-        .filter-option.active{background:#007aff;color:#fff;box-shadow:0 2px 8px rgba(0,122,255,.2)}
-        .filter-option.win-btn.active{background:#ffb347;color:#000}
-        .filter-option.win-btn:not(.active){background:#ffe68f;color:#5a3e0b}
-        .filter-option:active{transform:scale(.94)}
-        .filter-option.win-btn{position:relative}
-        .filter-option.win-btn::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:rgba(0,0,0,.2);border-radius:2px;opacity:0;transition:opacity .2s}
-        .filter-option.win-btn.long-press-hint::after{opacity:1}
-        .history-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-        .history-item{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;background:#f8f8f8;border-radius:12px;border:1px solid #eee}
-        .history-item.win{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(16,185,129,.05));border-color:rgba(16,185,129,.3)}
-        .history-item.lose{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.05));border-color:rgba(239,68,68,.3)}
-        .history-left{display:flex;flex-direction:column;gap:3px}
-        .history-period{font-size:11px;color:#888;font-weight:500}
-        .history-prediction{font-size:14px;font-weight:700;color:#333}
-        .history-right{display:flex;align-items:center;gap:10px}
-        .history-result{font-size:13px;font-weight:600;color:#666}
-        .history-status{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
-        .history-status.win{background:#10b981;color:#fff}
-        .history-status.lose{background:#ef4444;color:#fff}
-        .no-history{text-align:center;padding:40px 20px;color:#aaa;font-size:14px}
-        .nav-wrapper{position:fixed;bottom:12px;left:28px;right:28px;z-index:1000}
-        .bottom-nav{display:flex;justify-content:space-around;align-items:center;padding:3px;background:rgba(255,255,255,.35);backdrop-filter:blur(25px) saturate(160%);-webkit-backdrop-filter:blur(25px) saturate(160%);border-radius:9999px;border:1px solid rgba(255,255,255,.25);box-shadow:0 4px 24px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.03);position:relative;overflow:hidden}
-        .ripple-container{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden;border-radius:9999px}
-        .water-ripple{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(0,122,255,.15) 0%,rgba(0,122,255,.05) 40%,transparent 70%);transform:scale(0);animation:wripple .8s ease-out forwards}
-        @keyframes wripple{to{transform:scale(4);opacity:0}}
-        .bubble{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.6),rgba(0,122,255,.08));pointer-events:none;opacity:0}
-        .bubble.pop{animation:bubblePop .9s ease-out forwards}
-        @keyframes bubblePop{0%{opacity:.7;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-30px) scale(.2)}}
-        .nav-item{display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;padding:4px 8px;position:relative;z-index:10;-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .25s cubic-bezier(.68,-.55,.27,1.55)}
-        .nav-item:active{transform:scale(.82)}
-        .nav-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center;position:relative}
-        .nav-icon svg{width:25px;height:25px;fill:none;stroke:#b0b0b8;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:all .35s ease}
-        .nav-item.active .nav-icon svg{stroke:#007aff;fill:rgba(0,122,255,.1);filter:drop-shadow(0 2px 6px rgba(0,122,255,.3))}
-        .nav-icon::after{content:'';position:absolute;width:35px;height:35px;border-radius:50%;background:radial-gradient(circle,rgba(0,122,255,.12),transparent 70%);opacity:0;transition:opacity .4s,transform .4s;transform:scale(.4)}
-        .nav-item.active .nav-icon::after{opacity:1;transform:scale(1);animation:glow 2.2s ease-in-out infinite}
-        @keyframes glow{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.15);opacity:1}}
-        .nav-label{font-size:9px;font-weight:500;color:#b0b0b8;transition:all .35s ease}
-        .nav-item.active .nav-label{color:#007aff;font-weight:600}
-        .active-dot{position:absolute;bottom:-1px;width:4px;height:4px;border-radius:50%;background:#007aff;opacity:0;transition:opacity .3s;box-shadow:0 0 5px rgba(0,122,255,.5)}
-        .nav-item.active .active-dot{opacity:1}
-        .page-content{display:none}.page-content.active{display:block}
-        .telegram-container{position:fixed;top:55px;left:25px;right:25px;bottom:80px;overflow-y:auto;padding:20px 0}
-        .input-group{margin-bottom:20px}
-        .input-label{display:block;font-size:14px;font-weight:600;color:#333;margin-bottom:8px;letter-spacing:0.5px}
-        .telegram-input{width:100%;padding:15px 18px;font-size:15px;border:2px solid #e0e0e0;border-radius:16px;outline:none;transition:all 0.3s ease;background:#f8f8f8}
-        .telegram-input:focus{border-color:#8B5CF6;background:#fff;box-shadow:0 4px 12px rgba(139,92,246,.1)}
-        .telegram-input::placeholder{color:#aaa;font-size:14px}
-        .start-btn{width:100%;padding:18px;background:linear-gradient(135deg,#8B5CF6,#A78BFA);border:none;border-radius:16px;color:white;font-size:18px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.3s ease;box-shadow:0 8px 20px rgba(139,92,246,.3);margin-top:15px;text-transform:uppercase}
-        .start-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(139,92,246,.4)}
-        .start-btn:active{transform:scale(0.98)}
-        .start-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-        .telegram-status{margin-top:20px;padding:15px;border-radius:12px;font-size:14px;font-weight:500;text-align:center;display:none}
-        .telegram-status.success{background:#10b98120;color:#10b981;border:1px solid #10b981;display:block}
-        .telegram-status.error{background:#ef444420;color:#ef4444;border:1px solid #ef4444;display:block}
-        .telegram-status.info{background:#3b82f620;color:#3b82f6;border:1px solid #3b82f6;display:block}
-        .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center;animation:fadeIn .3s ease}
-        .modal-overlay.show{display:flex}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .modal-box{background:#fff;border-radius:24px;padding:30px 25px;width:85%;max-width:340px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.3);animation:modalPop .4s cubic-bezier(.68,-.55,.27,1.55)}
-        @keyframes modalPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-        .modal-icon{font-size:50px;margin-bottom:12px}
-        .modal-title{font-size:20px;font-weight:800;color:#333;margin-bottom:6px;letter-spacing:.5px}
-        .modal-subtitle{font-size:13px;color:#888;margin-bottom:20px;line-height:1.5}
-        .modal-input-group{margin-bottom:20px}
-        .modal-input-label{font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block}
-        .modal-input{width:100%;padding:14px 18px;font-size:28px;font-weight:800;text-align:center;border:2.5px solid #e0e0e0;border-radius:16px;outline:none;transition:all .3s ease;background:#f8f8fa;color:#8B5CF6;letter-spacing:3px}
-        .modal-input:focus{border-color:#8B5CF6;background:#fff;box-shadow:0 4px 16px rgba(139,92,246,.15)}
-        .modal-input::placeholder{color:#ccc;font-size:16px;font-weight:500;letter-spacing:0}
-        .modal-btn-row{display:flex;gap:10px}
-        .modal-btn{flex:1;padding:14px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s ease;letter-spacing:.5px}
-        .modal-btn:active{transform:scale(.95)}
-        .modal-btn.cancel{background:#f0f0f0;color:#666}
-        .modal-btn.cancel:hover{background:#e5e5e5}
-        .modal-btn.confirm{background:linear-gradient(135deg,#8B5CF6,#A78BFA);color:#fff;box-shadow:0 4px 15px rgba(139,92,246,.3)}
-        .modal-btn.confirm:hover{box-shadow:0 6px 20px rgba(139,92,246,.4)}
-        .win-preset-row{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;justify-content:center}
-        .win-preset{padding:8px 16px;border-radius:12px;background:#f0f0f5;border:2px solid transparent;font-size:14px;font-weight:700;color:#555;cursor:pointer;transition:all .2s ease}
-        .win-preset:hover{border-color:#8B5CF6;color:#8B5CF6}
-        .win-preset.selected{background:#8B5CF620;border-color:#8B5CF6;color:#8B5CF6}
-        .win-preset:active{transform:scale(.93)}
-        .bot-running-card{margin-top:20px;padding:20px;border-radius:18px;background:linear-gradient(135deg,#8B5CF610,#A78BFA10);border:2px solid #8B5CF630;display:none}
-        .bot-running-card.show{display:block}
-        .bot-running-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-        .bot-running-title{font-size:15px;font-weight:700;color:#8B5CF6;display:flex;align-items:center;gap:8px}
-        .bot-pulse{width:10px;height:10px;border-radius:50%;background:#10b981;animation:botPulse 1.5s ease-in-out infinite}
-        @keyframes botPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-        .bot-stop-btn{padding:6px 14px;border-radius:10px;background:#ef4444;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
-        .bot-stop-btn:active{transform:scale(.93)}
-        .bot-stats{display:flex;gap:12px;flex-wrap:wrap}
-        .bot-stat{flex:1;min-width:80px;padding:10px;background:#fff;border-radius:12px;text-align:center}
-        .bot-stat-value{font-size:20px;font-weight:800;color:#333}
-        .bot-stat-label{font-size:10px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-        .bot-stat-value.green{color:#10b981}
-        .bot-stat-value.red{color:#ef4444}
-        .bot-stat-value.purple{color:#8B5CF6}
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #050505; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 10px; overflow: hidden; }
+        
+        .app-container { background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(0, 229, 255, 0.4); box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); border-radius: 20px; width: 100%; max-width: 420px; height: 95vh; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        
+        .header { text-align: center; padding: 20px 10px; border-bottom: 1px solid rgba(0, 229, 255, 0.2); box-shadow: 0 5px 15px rgba(0, 229, 255, 0.05); background: linear-gradient(180deg, rgba(0,229,255,0.1) 0%, transparent 100%); }
+        .main-title { font-family: 'Black Ops One', cursive; font-size: 28px; color: #00e5ff; text-shadow: 0 0 15px #00e5ff, 0 0 30px rgba(0,229,255,0.8); letter-spacing: 2px; margin: 0; }
+
+        .content-area { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
+        .screen { display: none; animation: fadeIn 0.3s ease-in; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stats-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .stat { background: #001a22; padding: 8px 15px; border-radius: 8px; border: 1px dashed #00e5ff; font-weight: bold; font-size: 15px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
+        .win-txt { color: #00ffaa; text-shadow: 0 0 5px #00ffaa; }
+        .loss-txt { color: #ff3366; text-shadow: 0 0 5px #ff3366; }
+
+        .live-pred-box { background: rgba(0, 229, 255, 0.05); border: 2px solid #00e5ff; border-radius: 12px; padding: 20px 10px; text-align: center; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0, 229, 255, 0.15); position: relative; }
+        .live-clock { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #00e5ff; text-shadow: 0 0 15px #00e5ff; margin-bottom: 10px; }
+        .live-pred-title { color: #88ddff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }
+        .live-pred-value { font-size: 42px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); text-transform: uppercase; line-height: 1.1; }
+
+        .section-title { color: #88ddff; font-size: 13px; margin-bottom: 8px; margin-top: 10px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid rgba(0,229,255,0.3); padding-bottom: 5px;}
+        
+        .input-group { margin-bottom: 15px; }
+        label { color: #00e5ff; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block; }
+        input[type="text"] { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #00e5ff; color: #fff; border-radius: 8px; outline: none; transition: 0.3s; }
+        input[type="text"]:focus { box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; background: #001a22; color: #00e5ff; border: 1px solid #00e5ff; font-size: 14px; }
+        button:hover { background: #00e5ff; color: #000; box-shadow: 0 0 15px #00e5ff; }
+        
+        .power-btn { width: 100%; padding: 15px; font-size: 16px; border-radius: 10px; color: #00ffaa; border: 2px solid #00ffaa; background: rgba(0, 255, 170, 0.1); font-weight: 900; letter-spacing: 1px; margin-bottom: 15px; }
+        .power-btn:hover { background: #00ffaa; color: #000; box-shadow: 0 0 20px #00ffaa; }
+        .power-btn.active-stop { color: #ff3366; border-color: #ff3366; background: rgba(255, 51, 102, 0.1); }
+        .power-btn.active-stop:hover { background: #ff3366; color: #fff; box-shadow: 0 0 20px #ff3366; }
+
+        .btn-full { grid-column: span 2; }
+        .btn-save { background: #00e5ff; color: #000; box-shadow: 0 0 10px #00e5ff; margin-top: 10px;}
+
+        .server-btn { background: #001a22; color: #aaa; border: 1px solid #335566; }
+        .server-btn.active.aipro { background: #8a2be2; color: #fff; border-color: #8a2be2; box-shadow: 0 0 20px #8a2be2; }
+        .server-btn.active.premium { background: #00e5ff; color: #000; border-color: #00e5ff; box-shadow: 0 0 20px #00e5ff; }
+
+        .toggle-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #001a22; padding: 12px; border-radius: 8px; border: 1px solid rgba(0,229,255,0.2); }
+        .toggle-label { color: #00e5ff; font-weight: bold; font-size: 13px;}
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #335566; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
+        input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+
+        .session-log { margin-top: 5px; padding: 10px; background: rgba(0,0,0,0.6); border: 1px dashed #00e5ff; border-radius: 8px; height: 110px; overflow-y: auto; font-size: 12px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px; }
+        .log-entry { background: #001a22; padding: 6px 10px; border-left: 3px solid #00e5ff; border-radius: 4px; }
+        .log-win { border-color: #00ffaa; }
+        .log-loss { border-color: #ff3366; }
+
+        .ball-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; margin-bottom: 10px; border-bottom: 1px solid rgba(0,229,255,0.2); scrollbar-width: none; }
+        .ball-row::-webkit-scrollbar { display: none; }
+        .ball { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; color: #fff; box-shadow: 0 0 8px rgba(0,0,0,0.5); flex-shrink: 0; border: 2px solid rgba(255,255,255,0.2); }
+        .ball-red { background: linear-gradient(135deg, #ff3366, #cc0033); box-shadow: 0 0 10px #ff3366; }
+        .ball-green { background: linear-gradient(135deg, #00ffaa, #00cc88); color: #000; box-shadow: 0 0 10px #00ffaa; }
+
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        .history-item { background: #001a22; border-left: 4px solid #00e5ff; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        .badge { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .badge-win { background: rgba(0, 255, 170, 0.2); color: #00ffaa; border: 1px solid #00ffaa; }
+        .badge-loss { background: rgba(255, 51, 102, 0.2); color: #ff3366; border: 1px solid #ff3366; }
+
+        .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #000b11; border-top: 1px solid rgba(0, 229, 255, 0.3); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -5px 15px rgba(0, 229, 255, 0.1); z-index: 10;}
+        .nav-btn { background: transparent; border: none; color: #558899; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; padding: 5px; box-shadow: none; text-transform: none; }
+        .nav-btn:hover { background: transparent; color: #00e5ff; box-shadow: none; }
+        .nav-btn.active { color: #00e5ff; text-shadow: 0 0 10px #00e5ff; font-weight: bold; }
+        .nav-icon { font-size: 20px; }
     </style>
 </head>
 <body>
-    <div class="page-title" id="pageTitle">
-        <svg viewBox="0 0 24 24" id="pageTitleIcon"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span id="pageTitleText">ʜᴏᴍᴇ</span>
-    </div>
-    <div class="page-content active" id="homePage">
-        <div class="game-section">
-            <div class="long-box">
-                <span class="star-symbol" id="starSymbol">✦</span>
-                <span class="period-number" id="periodNumber">Loading...</span>
-                <div class="timer-display" id="timerDisplay" onclick="toggleGame()">60</div>
+
+    <div class="app-container">
+        <div class="header">
+            <h1 class="main-title">RAO SAHAB VIP</h1>
+        </div>
+
+        <div class="content-area">
+            
+            <div id="mainScreen" class="screen active">
+                <div class="stats-bar">
+                    <div class="stat win-txt">🟢 TOTAL WIN: <span id="winCount">0</span></div>
+                    <div class="stat loss-txt">🔴 LOSS: <span id="lossCount">0</span></div>
+                </div>
+
+                <div class="live-pred-box">
+                    <div class="live-clock" id="liveTime">30s</div>
+                    <div class="live-pred-title" id="predPeriod">Waiting for Session...</div>
+                    <div class="live-pred-value" id="predValue">--</div>
+                </div>
+
+                <div class="section-title">Prediction Server</div>
+                <div class="btn-grid">
+                    <button id="btnAiPro" class="server-btn" onclick="setServer('AIPRO')">🟣 AI PRO</button>
+                    <button id="btnPremium" class="server-btn active premium" onclick="setServer('PREMIUM')">💠 RAO PREMIUM</button>
+                </div>
+
+                <button class="power-btn" id="powerBtn" onclick="toggleBot()">▶️ START VIP</button>
+
+                <div class="section-title">Live Session Log</div>
+                <div class="session-log" id="sessionLog">
+                    <div class="log-entry" style="text-align:center; color:#558899; border:none;">Bot is offline.</div>
+                </div>
             </div>
-            <div class="prediction-display">
-                <div class="prediction-line">
-                    <div class="prediction-text" id="predictionText">BIGG</div>
-                    <div class="prediction-num clr-green" id="predictionNum">7</div>
+
+            <div id="settingsScreen" class="screen">
+                <div class="section-title">Telegram Configuration</div>
+                <div class="input-group">
+                    <label>Bot Token</label>
+                    <input type="text" id="botToken" placeholder="Enter Telegram Bot Token">
                 </div>
-                <div class="prediction-confidence" id="predictionConfidence">AI CONFIDENCE: --</div>
-                <div class="gauge-section">
-                    <div class="gauge-container"><div class="gauge" id="gauge1"><div class="gauge-glow green"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill green" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill1"/></svg></div><span class="gauge-label">PASS</span></div>
-                    <div class="gauge-container"><div class="gauge" id="gauge2"><div class="gauge-glow red"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill red" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill2"/></svg></div><span class="gauge-label">FAIL</span></div>
-                    <div class="gauge-container"><div class="gauge" id="gauge3"><div class="gauge-glow gray"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill gray" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill3"/></svg></div><span class="gauge-label">ACCURACY</span></div>
-                    <div class="gauge-container"><div class="gauge" id="gauge4"><div class="gauge-glow purple"></div><svg viewBox="0 0 36 36"><circle class="gauge-bg" cx="18" cy="18" r="14"/><circle class="gauge-fill purple" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88" id="gaugeFill4"/></svg></div><span class="gauge-label">BETS</span></div>
+                <div class="input-group">
+                    <label>Chat ID / Channel ID</label>
+                    <input type="text" id="chatId" placeholder="Enter Target Chat ID">
                 </div>
-                <div class="info-panel">
-                    <div class="info-row"><div class="info-box pass-box"><span class="info-label">PASS</span><span class="info-value" id="passCount">0</span></div><div class="info-box fail-box"><span class="info-label">FAIL</span><span class="info-value" id="failCount">0</span></div></div>
-                    <div class="info-row"><div class="info-box accuracy-box"><span class="info-label">ACCURACY</span><span class="info-value" id="accuracyValue">0%</span></div></div>
-                    <div class="info-row"><div class="info-box bets-box"><span class="info-label">BETS</span><span class="info-value" id="betsValue">0</span></div></div>
+                
+                <div class="section-title" style="margin-top: 20px;">Bot Preferences</div>
+                <div class="toggle-group">
+                    <span class="toggle-label">🎨 Send Color Prediction</span>
+                    <label class="switch">
+                        <input type="checkbox" id="colorToggle">
+                        <span class="slider"></span>
+                    </label>
                 </div>
-                <div class="home-credit">ᴩᴏᴡᴇʀᴅ ʙʏ <span>@ᴀᴋᴇʟᴀʜᴀᴄᴋᴇʀ</span></div>
+
+                <button class="btn-full btn-save" onclick="saveSettings()">💾 Save Settings</button>
+                <div id="saveMsg" style="color:#00ffaa; text-align:center; margin-top:10px; font-size:12px; display:none;">Settings Saved Successfully!</div>
             </div>
+
+            <div id="historyScreen" class="screen">
+                <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Calculated Past Results</span>
+                    <button onclick="loadHistory()" style="padding: 5px 10px; font-size:10px; border-radius: 5px;">🔄 Refresh</button>
+                </div>
+                
+                <div class="ball-row" id="historyBalls">
+                    <p style="text-align:center; width:100%; color:#558899; font-size:12px; margin-top:10px;">Click Refresh to run algorithms.</p>
+                </div>
+
+                <div class="history-list" id="historyContainer"></div>
+            </div>
+
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-btn active" id="nav-mainScreen" onclick="switchTab('mainScreen')">
+                <span class="nav-icon">🏠</span>
+                <span>Main</span>
+            </button>
+            <button class="nav-btn" id="nav-settingsScreen" onclick="switchTab('settingsScreen')">
+                <span class="nav-icon">⚙️</span>
+                <span>Settings</span>
+            </button>
+            <button class="nav-btn" id="nav-historyScreen" onclick="switchTab('historyScreen'); loadHistory();">
+                <span class="nav-icon">📜</span>
+                <span>History</span>
+            </button>
         </div>
     </div>
-    <div class="page-content" id="serverPage"></div>
-    <div class="page-content" id="historyPage">
-        <div class="history-container">
-            <div class="history-header">
-                <div class="header-top"><span class="history-title">Prediction History</span><div class="win-loss-badge"><span class="win-badge" id="winCountDisplay">WIN: 0</span><span class="lose-badge" id="loseCountDisplay">LOSS: 0</span></div></div>
-                <div class="filter-toggle" id="unifiedToggle">
-                    <span class="filter-option active" data-filter="30S" onclick="setGameTypeFilter('30S')">30S</span>
-                    <span class="filter-option" data-filter="1M" onclick="setGameTypeFilter('1M')">1M</span>
-                    <span class="filter-option win-btn" id="winFilterBtn" onclick="toggleWinFilter()" onmousedown="startLongPress()" onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()" ontouchstart="startLongPress()" ontouchend="cancelLongPress()" ontouchcancel="cancelLongPress()">🏆 WIN</span>
-                </div>
-            </div>
-            <div class="history-list" id="historyList"><div class="no-history">No predictions yet</div></div>
-        </div>
-    </div>
-    <div class="page-content" id="telegramPage">
-        <div class="telegram-container">
-            <div class="input-group"><label class="input-label">🤖 Bot Token</label><input type="text" class="telegram-input" id="botToken" placeholder="Enter your Telegram bot token"></div>
-            <div class="input-group"><label class="input-label">📢 Channel ID</label><input type="text" class="telegram-input" id="channelId" placeholder="Enter channel ID (e.g., @channel or -100...)"></div>
-            <button class="start-btn" id="startBotBtn" onclick="handleStartClick()">▶ START BOT</button>
-            <div class="telegram-status" id="telegramStatus"></div>
-            <div class="bot-running-card" id="botRunningCard">
-                <div class="bot-running-header"><div class="bot-running-title"><div class="bot-pulse"></div> Bot Running</div><button class="bot-stop-btn" onclick="stopTelegramBot()">■ STOP</button></div>
-                <div class="bot-stats">
-                    <div class="bot-stat"><div class="bot-stat-value purple" id="botTotalSent">0</div><div class="bot-stat-label">Sent</div></div>
-                    <div class="bot-stat"><div class="bot-stat-value green" id="botWinCount">0</div><div class="bot-stat-label">Wins</div></div>
-                    <div class="bot-stat"><div class="bot-stat-value red" id="botTargetWin">0</div><div class="bot-stat-label">Target</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-overlay" id="winModal">
-        <div class="modal-box">
-            <div class="modal-icon">🎯</div>
-            <div class="modal-title">Set Target Wins</div>
-            <div class="modal-subtitle">How many WINS should the bot achieve before stopping?</div>
-            <div class="win-preset-row">
-                <div class="win-preset" onclick="selectPreset(this,5)">5</div>
-                <div class="win-preset" onclick="selectPreset(this,10)">10</div>
-                <div class="win-preset" onclick="selectPreset(this,20)">20</div>
-                <div class="win-preset" onclick="selectPreset(this,50)">50</div>
-                <div class="win-preset" onclick="selectPreset(this,100)">100</div>
-            </div>
-            <div class="modal-input-group"><label class="modal-input-label">Or enter custom number</label><input type="number" class="modal-input" id="winCountInput" placeholder="e.g. 15" min="1" max="999" oninput="clearPresetSelection()"></div>
-            <div class="modal-btn-row"><button class="modal-btn cancel" onclick="closeWinModal()">Cancel</button><button class="modal-btn confirm" onclick="confirmAndStart()">🚀 START</button></div>
-        </div>
-    </div>
-    <div class="nav-wrapper">
-        <nav class="bottom-nav" id="bottomNav">
-            <div class="ripple-container" id="rippleContainer"></div>
-            <div class="nav-item active" data-title="ʜᴏᴍᴇ" data-icon="home" data-page="homePage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><span class="nav-label">Home</span><div class="active-dot"></div></div>
-            <div class="nav-item" data-title="sᴇʀᴠᴇʀ" data-icon="server" data-page="serverPage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg></div><span class="nav-label">Server</span><div class="active-dot"></div></div>
-            <div class="nav-item" data-title="ʜɪsᴛᴏʀʏ" data-icon="history" data-page="historyPage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="nav-label">History</span><div class="active-dot"></div></div>
-            <div class="nav-item" data-title="ᴛᴇʟᴇɢʀᴀᴍ" data-icon="telegram" data-page="telegramPage" onclick="switchTab(this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-17.15 6.858a1.878 1.878 0 0 0-.1 3.456l3.942 1.617 1.617 5.131a1.188 1.188 0 0 0 1.928.467l2.322-2.322 4.373 3.269a1.878 1.878 0 0 0 2.883-1.074l3.393-15.612a2.24 2.24 0 0 0-2.186-2.005z"/><line x1="9" y1="14" x2="13" y2="10"/></svg></div><span class="nav-label">Telegram</span><div class="active-dot"></div></div>
-        </nav>
-    </div>
 
-<script>
-const icons={home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',server:'<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',history:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',telegram:'<path d="M21.198 2.433a2.242 2.242 0 0 0-1.022.215l-17.15 6.858a1.878 1.878 0 0 0-.1 3.456l3.942 1.617 1.617 5.131a1.188 1.188 0 0 0 1.928.467l2.322-2.322 4.373 3.269a1.878 1.878 0 0 0 2.883-1.074l3.393-15.612a2.24 2.24 0 0 0-2.186-2.005z"/><line x1="9" y1="14" x2="13" y2="10"/>'};
+    <script>
+        let isActive = false;
+        let isFetching = false;
+        let currentServer = 'PREMIUM';
+        let wins = 0; let losses = 0;
+        let lastProcessedPeriod = "";
+        let pendingPrediction = null; 
+        let syncLoop;
+        let clockLoop;
+        
+        const apiUrl = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageSize=1000";
 
-let is30Sec=false,lastFetchedSecond=-1;
-let currentPrediction=null,currentPeriod=null,currentPredictedNumber=null,currentConfidence=null;
-let predictionHistory=JSON.parse(localStorage.getItem('predictionHistory')||'[]');
-let totalPass=predictionHistory.filter(h=>h.isWin).length;
-let totalFail=predictionHistory.filter(h=>!h.isWin).length;
-let totalBets=predictionHistory.length;
-let currentGameTypeFilter='30S',winFilterActive=false,longPressTimer=null;
-const LONG_PRESS_DURATION=800;
-const API_30S='https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json';
-const API_1M='https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json';
+        document.getElementById('botToken').value = localStorage.getItem('raoToken') || "";
+        document.getElementById('chatId').value = localStorage.getItem('raoChatId') || "";
 
-const STICKER_IDS={
-    SESSION_START:"CAACAgUAAxkBAAEPzZ1pGyMciiSGpafrEuWn8sIpUOY7LAACEBYAAgvYYFZw-0A5gsyL8DYE",
-    SESSION_END:"CAACAgUAAxkBAAEPzZ9pGyMgrQcCQ1CfxkxiRBWDt8BAWAACVBMAAn5aYFbgPVLalZCklzYE",
-    WIN_1:"CAACAgUAAxkBAAEGwsFovqmB6jgSkGhBeQmBKWbVxHjk9wAC0hcAAsPycVSffCbGo2_kcB4E",
-    WIN_2:"CAACAgUAAxkBAAEGwqhovqqeM1R9IpH-ZxVnW9_d6LvGPQACUxMAAkPLSVVfxaN8acPr9h4E",
-    ORIGINAL:["CAACAgUAAxkBAAEPzHppGo4r_YKMiiwDwVnWPG3zevNamwACfRcAAlgJMFUIaM2jq2vLQjYE","CAACAgUAAxkBAAEPzHtpGo4sJMNxv10U5OBPHX4bC9oAAbwAAqkcAAJ5QShVbXSBpWkhXpM2BA","CAACAgUAAxkBAAEPzIJpGo43vasVJIRVhQIWhkwa-mPMmgACCRkAAsXuMFX3rmGxUPezRDYE","CAACAgUAAxkBAAEPzIRpGo462DdBx8TSYYLGdgxYRTYSIwACvxMAAorZMVWw-wABC3iNJok2BA","CAACAgUAAxkBAAEPzIZpGo48O78E3FF10uB8inzo4LMAAY8AAmwaAAKOmTBVmGl4UB4dV_82BA","CAACAgUAAxkBAAEPzIhpGo49QreiCHAr_4aZFl7TRfwttgACFxkAAlXJKFWmgYbblCI0CTYE","CAACAgUAAxkBAAEPzIppGo4_jza6ParoJXewoHUCqPwoYwAC4RgAAiuPMFUOcyPoR8JC5jYE","CAACAgUAAxkBAAEPzIxpGo5BwxOvxV1oTDYxkq4htnpq-gACwBgAAvTvMFXao8FMbedOsjYE","CAACAgUAAxkBAAEPzI5pGo5G7yIc4AABe8Mljb6pOow0WB4AAokWAALKdTFVXAdl8XJo0jc2BA"],
-    RANDOM:["CAACAgUAAxkBAAEPzJhpGo5VvKAiU-Xtp0EOX5nTptPcNAACGhQAArBSeVThRb8gLvmIDzYE","CAACAgUAAxkBAAEPzXNpGx-9LgoYflb3VvYNqhluEsgS3QACrBcAApi86VXGUUGNIdKDaTYE","CAACAgUAAxkBAAEPzXVpGx_M6OJ-uVuKeT3tvxzQfXEn8wACHRUAAsOn4Fc2h9u69xnxRzYE","CAACAgUAAxkBAAEPzXdpGx_OVU3so6Q1PgJYUaAKsG3-2QAC3RgAAno74Fdni-89wX4mNjYE","CAACAgUAAxkBAAEPzXlpGx_W_1xeKXQqFv0QOmWVNltkpAAC_xUAApL0UFVbEO-2F_nXITYE"]
-};
+        function saveSettings() {
+            localStorage.setItem('raoToken', document.getElementById('botToken').value);
+            localStorage.setItem('raoChatId', document.getElementById('chatId').value);
+            let msg = document.getElementById('saveMsg');
+            msg.style.display = "block";
+            setTimeout(() => { msg.style.display = "none"; }, 3000);
+        }
 
-const PHOTO_URLS={
-    SESSION_START:"https://ibb.co/4ywdxNd",
-    SESSION_END:"https://ibb.co/b5PDFpSb",
-    BIG_30S:"https://ibb.co/hxKHXcb4",
-    SMALL_30S:"https://ibb.co/Z6t3RR76",
-    BIG_1M:"https://ibb.co/Hf01G0m9",
-    SMALL_1M:"https://ibb.co/kVj8wMt6"
-};
+        // COMPLETE STICKERS ARRAYS
+        const winFirstSticker = "CAACAgUAAxkBAAEQg65pkGLJ3sfc9IXFEvzrDZxtQULGxQACuxMAAtZgYVZaFxCncOnSvjoE";
+        const winMiddleStickers = ["CAACAgUAAxkBAAEQlKRpmc6YKoTbG9mtawI1wwABuQcxkfQAAkoTAAKLKmFWDJoBh856d0Y6BA", "CAACAgUAAxkBAAEQlKZpmc6aK74AAdmQTU5pzHvRwaqw7kYAAhcNAAKnzeBWXQtoMocETe06BA", "CAACAgUAAxkBAAEQg7JpkGLRYnEJuXVf4IyE75RaVzuv7AACFxYAAl_PYFYjutVlOf2UrToE", "CAACAgUAAxkBAAEQg7ppkGLqX73S-rW9xnkTZqPyvouhKAACthgAAuLVYVazlUtOmfyVVToE", "CAACAgQAAxkBAAEQlLRpmc70FulL3-eJzdVKbpptjkaPMgACSRoAAgNU2VHZlzKhaQbrezoE", "CAACAgQAAxkBAAEQlLZpmc76iKOhV0or8IE9TSO0FhaYCQACKxMAAtLVMFNhNXRNB2za4DoE", "CAACAgQAAxkBAAEQlLhpmc8DgRaIES1Z4biLe6i0lcRGmwACjhYAAhYOQFESDRipdlattjoE"];
+        const winLastStickers = ["CAACAgUAAxkBAAEQlK5pmc6yU2kj7DMmOHGDzzo82qxT1gAC1hMAAmp9YVbvJhOMbbSNmDoE", "CAACAgUAAxkBAAEQlKhpmc6etFnxDItnzJwhAWlPXg240gAC0xMAAtJlYVZ8CDYuQ-4m-DoE"];
+        const lossStickers = ["CAACAgUAAxkBAAEQlLJpmc6_OGO-OzS4pO4D6BxunLlM2QACcRQAAiWLYFaCAQAB8ZzOON86BA", "CAACAgUAAxkBAAEQlKJpmc6TGK5kA5LlPk4RmwWv2F-obgAC4BEAAsSNmVRK1rmkcLLTfDoE", "CAACAgQAAxkBAAEQg-5pkGWF-FAmdhNFkU8uV8gE9X3XRAAClB4AAvXaeVENfiCb3FU6WToE", "CAACAgUAAxkBAAEQlJ5pmc5_Kk87IB5RAAGl3SXrK_Zli7EAAjMPAAIyWnlX74RGpO7pE4A6BA"];
 
-let telegramBotActive=false,telegramBotToken='',telegramChannelId='';
-let telegramTargetWins=0,telegramCurrentWins=0,telegramTotalSent=0;
-let telegramLastPeriod=null,originalStickerIndex=0;
-let lastPredictionMsgId=null;
-let sessionStartTime=0;
+        // 100% DETERMINISTIC STICKER PICKER (No Math.random)
+        function getDeterministicSticker(array, periodString) {
+            let num = BigInt(periodString);
+            let index = num % BigInt(array.length);
+            return array[Number(index)];
+        }
 
-/* ══════════ MESSAGE QUEUE ══════════ */
-let msgQueue=[],queueRunning=false;
-function enqueue(fn){msgQueue.push(fn);if(!queueRunning)drainQueue();}
-async function drainQueue(){
-    if(queueRunning)return;queueRunning=true;
-    while(msgQueue.length>0){
-        const task=msgQueue.shift();
-        try{await task();}catch(e){console.error('Queue err:',e);}
-        if(msgQueue.length>0) await sleep(100);
-    }
-    queueRunning=false;
-}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-updateHistoryDisplay();updateStatsDisplay();syncGauges();
-
-function getISTTimeString(){
-    const now=new Date();const ist=new Date(now.getTime()+5.5*3600000+now.getTimezoneOffset()*60000);
-    let h=ist.getHours();const m=String(ist.getMinutes()).padStart(2,'0');const s=String(ist.getSeconds()).padStart(2,'0');
-    const ampm=h>=12?'pm':'am';h=h%12;if(h===0)h=12;return h+':'+m+':'+s+' '+ampm;
-}
-
-function formatDuration(ms){
-    const totalSec=Math.floor(ms/1000);
-    if(totalSec<60) return totalSec+' seconds';
-    const min=Math.floor(totalSec/60);const sec=totalSec%60;
-    if(min<60) return min+' minute'+(min>1?'s':'')+(sec>0?' '+sec+' sec':'');
-    const hr=Math.floor(min/60);const rm=min%60;
-    return hr+' hour'+(hr>1?'s':'')+(rm>0?' '+rm+' min':'');
-}
-
-function getPredictionPhoto(pred,g30){
-    if(g30) return pred==='BIGG'?PHOTO_URLS.BIG_30S:PHOTO_URLS.SMALL_30S;
-    return pred==='BIGG'?PHOTO_URLS.BIG_1M:PHOTO_URLS.SMALL_1M;
-}
-
-function buildPredictionCaption(period,prediction,number,confidence){
-    const gameLabel=is30Sec?'30 s':'1 M';
-    const resultText=prediction==='BIGG'?'𝐁ɪɢɢ '+number:'𝐒ᴍᴀʟʟ '+number;
-    return '▰▰▰ ᴀᴋᴇʟᴀ ᴀɪ ᴜʟᴛʀᴀ ᴘʀᴇᴅɪᴄᴛɪᴏɴ ▰▰▰\n\n'+
-        '   ➠  🎰 𝐆ᴀᴍᴇ   ⇝ 𝐀ʟʟ 𝐆ᴀᴍᴇ\n'+
-        '   ➠  💸 𝐖ɪɴɢᴏ ⇝ '+gameLabel+'\n'+
-        '   ➠  🎁 𝐏ᴇʀɪᴏᴅ⇝ '+period+'\n'+
-        '   ➠ 💥 𝐑ᴇsᴜʟᴛ ⇝ '+resultText+'\n'+
-        '   ➠ 🔥 𝐂ᴏɴғɪᴅᴇɴᴄᴇ ⇝ '+confidence+' %\n'+
-        '   ➠  🚀 𝐒ᴇʀᴠᴇʀ ⇝ 𝐍ᴏᴠᴀ x 𝐆ᴇɴ 2\n\n'+
-        '▰▰▰ ᴘᴏᴡᴇʀᴅ ʙʏ ᴀᴋᴇʟᴀ ᴛʀᴀᴅᴇʀ ▰▰▰';
-}
-
-/* ══════════ AI ENGINE ══════════ */
-function advancedPredict(data){
-    if(!data||data.length<3) return{prediction:'BIGG',number:7,confidence:52};
-    const nums=data.map(d=>parseInt(d.number));const len=nums.length;const S=new Float64Array(10);
-    const W=Math.min(len,40);const ewf=new Float64Array(10);let tW=0;
-    for(let i=0;i<W;i++){const w=Math.exp(-i*0.055);ewf[nums[i]]+=w;tW+=w;}
-    const avg1=tW/10;for(let d=0;d<10;d++) S[d]+=(avg1-ewf[d])*2.2;
-    for(let d=0;d<10;d++){let gap=W;for(let i=0;i<W;i++){if(nums[i]===d){gap=i;break;}}S[d]+=(1/(1+Math.exp(-0.35*(gap-5))))*5.5;}
-    if(len>=10){const T=Array.from({length:10},()=>new Float64Array(10));const TC=new Float64Array(10);const depth=Math.min(len-1,60);for(let i=0;i<depth;i++){T[nums[i+1]][nums[i]]++;TC[nums[i+1]]++;}const cur=nums[0];if(TC[cur]>=3){for(let d=0;d<10;d++) S[d]+=(T[cur][d]/TC[cur])*9;}}
-    if(len>=15){const T2={};const depth2=Math.min(len-2,45);for(let i=0;i<depth2;i++){const k=nums[i+2]*10+nums[i+1];if(!T2[k])T2[k]={c:new Float64Array(10),t:0};T2[k].c[nums[i]]++;T2[k].t++;}const ck=nums[1]*10+nums[0];if(T2[ck]&&T2[ck].t>=2){for(let d=0;d<10;d++) S[d]+=(T2[ck].c[d]/T2[ck].t)*7;}}
-    if(len>=20){const T3={};const depth3=Math.min(len-3,40);for(let i=0;i<depth3;i++){const k=nums[i+3]*100+nums[i+2]*10+nums[i+1];if(!T3[k])T3[k]={c:new Float64Array(10),t:0};T3[k].c[nums[i]]++;T3[k].t++;}const ck3=nums[2]*100+nums[1]*10+nums[0];if(T3[ck3]&&T3[ck3].t>=2){for(let d=0;d<10;d++) S[d]+=(T3[ck3].c[d]/T3[ck3].t)*5;}}
-    if(len>=12){const rLen=Math.min(5,len),oLen=Math.min(25,len-5);const recent=new Float64Array(10),older=new Float64Array(10);for(let i=0;i<rLen;i++) recent[nums[i]]++;for(let i=5;i<5+oLen;i++) older[nums[i]]++;for(let d=0;d<10;d++){const rR=recent[d]/rLen,oR=oLen>0?older[d]/oLen:0.1;if(oR>0.06&&rR<0.05) S[d]+=3.0;if(rR>=0.5&&oR<0.12) S[d]-=1.8;}}
-    const bs=nums.slice(0,Math.min(20,len)).map(n=>n>=5?1:0);let bsStk=1;while(bsStk<bs.length&&bs[bsStk]===bs[0]) bsStk++;if(bsStk>=3){const p=Math.min(bsStk*1.6,8);(bs[0]===1?[0,1,2,3,4]:[5,6,7,8,9]).forEach(d=>S[d]+=p);}
-    if(bs.length>=7){let alt=0;for(let i=0;i<6;i++) if(bs[i]!==bs[i+1]) alt++;if(alt>=5)(bs[0]===1?[0,1,2,3,4]:[5,6,7,8,9]).forEach(d=>S[d]+=2.5);}
-    const oeW=nums.slice(0,Math.min(10,len));const oddC=oeW.filter(x=>x%2===1).length;if(oddC>=7) [0,2,4,6,8].forEach(d=>S[d]+=2.0);else if(oddC<=3) [1,3,5,7,9].forEach(d=>S[d]+=2.0);
-    if(len>=5){let ema=nums[0];for(let i=1;i<Math.min(10,len);i++) ema=0.2*nums[i]+0.8*ema;const dev=ema-4.5;if(Math.abs(dev)>1.2){for(let d=0;d<10;d++) S[d]+=(4.5-d)*dev*0.12;}}
-    if(len>=3){const sm=(nums[0]+nums[1]+nums[2])%10;S[sm]+=2.0;S[(sm+5)%10]+=1.2;const sm2=(nums[0]*nums[1])%10;S[sm2]+=1.5;}
-    if(len>=2){const xv=nums[0]^nums[1];if(xv<=9) S[xv]+=1.8;const dif=Math.abs(nums[0]-nums[1]);if(dif<=9){S[dif]+=1.5;S[9-dif]+=1.0;}if(len>=3){const xv2=nums[1]^nums[2];if(xv2<=9) S[xv2]+=1.0;}}
-    if(len>=3){const d1=nums[0]-nums[1],d2=nums[1]-nums[2];if(d1===d2&&d1!==0){const pred=nums[0]+d1;if(pred>=0&&pred<=9) S[pred]+=5;}if(Math.abs(d1-d2)<=1&&d1!==0){const pred=nums[0]+d1;if(pred>=0&&pred<=9) S[pred]+=2.5;}}
-    if(len>=6){for(let j=2;j<Math.min(len-2,35);j++){if(nums[j+1]===nums[1]&&nums[j]===nums[0]&&j>=1){S[nums[j-1]]+=3.5;}}}
-    if(len>=6){const w8=nums.slice(0,Math.min(8,len));const mu=w8.reduce((a,b)=>a+b,0)/w8.length;let vr=w8.reduce((s,x)=>s+(x-mu)**2,0)/w8.length;if(vr<3){for(let d=0;d<10;d++){const dist=Math.abs(d-mu);if(dist<=2) S[d]+=1.8-dist*0.4;}}else if(vr>9){S[0]+=1.2;S[9]+=1.2;S[1]+=0.5;S[8]+=0.5;}}
-    if(len>=2){const gr=Math.round(nums[0]*0.618)%10;S[gr]+=1.5;const fib=(nums[0]+nums[1])%10;S[fib]+=1.2;const inv=(10-nums[0])%10;S[inv]+=1.0;}
-    let best=0;for(let d=1;d<10;d++) if(S[d]>S[best]) best=d;
-    const sorted=[...S].sort((a,b)=>b-a);const margin=sorted[0]-sorted[1];const totalRange=sorted[0]-sorted[9];const conf=Math.min(97,Math.max(52,Math.round(54+margin/(Math.max(totalRange,1))*42)));
-    return{prediction:best>=5?'BIGG':'SMALL',number:best,confidence:conf};
-}
-
-function getNumColor(n){if(n===0)return'clr-redviolet';if(n===5)return'clr-greenviolet';if([1,3,7,9].includes(n))return'clr-green';return'clr-red';}
-window.startLongPress=function(){if(longPressTimer)clearTimeout(longPressTimer);document.getElementById('winFilterBtn').classList.add('long-press-hint');longPressTimer=setTimeout(()=>{resetHistoryForCurrentGame();document.getElementById('winFilterBtn').classList.remove('long-press-hint');longPressTimer=null;},LONG_PRESS_DURATION);};
-window.cancelLongPress=function(){if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}document.getElementById('winFilterBtn').classList.remove('long-press-hint');};
-function resetHistoryForCurrentGame(){predictionHistory=predictionHistory.filter(i=>i.gameType!==currentGameTypeFilter);totalPass=predictionHistory.filter(h=>h.isWin).length;totalFail=predictionHistory.filter(h=>!h.isWin).length;totalBets=predictionHistory.length;localStorage.setItem('predictionHistory',JSON.stringify(predictionHistory));updateStatsDisplay();syncGauges();updateHistoryDisplay();if(navigator.vibrate)navigator.vibrate(100);}
-window.setGameTypeFilter=function(f){currentGameTypeFilter=f;document.querySelectorAll('#unifiedToggle .filter-option[data-filter]').forEach(o=>{o.classList.toggle('active',o.dataset.filter===f);});updateHistoryDisplay();};
-window.toggleWinFilter=function(){winFilterActive=!winFilterActive;document.getElementById('winFilterBtn').classList.toggle('active',winFilterActive);updateHistoryDisplay();};
-function updateWinLossBadge(){const w=predictionHistory.filter(h=>h.gameType===currentGameTypeFilter&&h.isWin).length;const l=predictionHistory.filter(h=>h.gameType===currentGameTypeFilter&&!h.isWin).length;document.getElementById('winCountDisplay').textContent='WIN: '+w;document.getElementById('loseCountDisplay').textContent='LOSS: '+l;}
-function updateGauge(id,val){const off=88-(val/100)*88;document.getElementById('gaugeFill'+id).style.strokeDashoffset=off;const g=document.getElementById('gauge'+id);if(val>70)g.classList.add('high');else g.classList.remove('high');}
-function syncGauges(){const total=totalPass+totalFail;const passP=total>0?Math.round(totalPass/total*100):0;const failP=total>0?Math.round(totalFail/total*100):0;const accP=total>0?Math.round(totalPass/total*100):0;const betsP=Math.min(100,Math.round(totalBets/50*100));setTimeout(()=>updateGauge(1,passP),100);setTimeout(()=>updateGauge(2,failP),200);setTimeout(()=>updateGauge(3,accP),300);setTimeout(()=>updateGauge(4,betsP),400);}
-function calculateAccuracy(){const t=totalPass+totalFail;return t===0?'0%':(totalPass/t*100).toFixed(1)+'%';}
-function updateStatsDisplay(){document.getElementById('passCount').textContent=totalPass;document.getElementById('failCount').textContent=totalFail;document.getElementById('accuracyValue').textContent=calculateAccuracy();document.getElementById('betsValue').textContent=totalBets;}
-function getActualResult(n){return parseInt(n)>=5?'BIGG':'SMALL';}
-
-/* ══════════ CHECK PREVIOUS PREDICTION ══════════ */
-function checkPreviousPrediction(data){
-    if(!currentPrediction||!currentPeriod)return;
-    const r=data.find(i=>i.issueNumber===currentPeriod);
-    if(r){
-        const actual=getActualResult(r.number);
-        const isWin=(currentPrediction==='BIGG'&&actual==='BIGG')||(currentPrediction==='SMALL'&&actual==='SMALL');
-        const numMatch=currentPredictedNumber===parseInt(r.number);
-        if(isWin)totalPass++;else totalFail++;
-        totalBets++;
-        predictionHistory.unshift({period:currentPeriod,prediction:currentPrediction,predictedNumber:currentPredictedNumber,actual,number:r.number,actualColor:r.color,isWin,numMatch,gameType:is30Sec?'30S':'1M',timestamp:Date.now()});
-        if(predictionHistory.length>50)predictionHistory=predictionHistory.slice(0,50);
-        localStorage.setItem('predictionHistory',JSON.stringify(predictionHistory));
-        updateHistoryDisplay();updateStatsDisplay();syncGauges();
-        if(navigator.vibrate)navigator.vibrate(isWin?[100,50,100,50,100]:[300]);
-
-        if(telegramBotActive){
-            if(isWin){
-                /* WIN: keep message, send stickers */
-                telegramCurrentWins++;updateBotCard();
-                lastPredictionMsgId=null; // don't delete win msg
-                const origIdx=originalStickerIndex;
-                originalStickerIndex=(originalStickerIndex+1)%STICKER_IDS.ORIGINAL.length;
-                const randIdx=Math.floor(Math.random()*STICKER_IDS.RANDOM.length);
-                enqueue(()=>sendTelegramSticker(STICKER_IDS.ORIGINAL[origIdx]));
-                enqueue(()=>sendTelegramSticker(STICKER_IDS.RANDOM[randIdx]));
-                if(telegramCurrentWins>=telegramTargetWins){
-                    enqueue(async()=>{await sleep(500);await doStopBot();});
+        function startClock() {
+            clockLoop = setInterval(() => {
+                let currentSeconds = new Date().getSeconds();
+                let countdown = 30 - (currentSeconds % 30);
+                document.getElementById('liveTime').innerText = countdown + "s";
+                if(countdown <= 5) {
+                    document.getElementById('liveTime').style.color = "#ff3366";
+                    document.getElementById('liveTime').style.textShadow = "0 0 15px #ff3366";
+                } else {
+                    document.getElementById('liveTime').style.color = "#00e5ff";
+                    document.getElementById('liveTime').style.textShadow = "0 0 15px #00e5ff";
                 }
-            }else{
-                /* LOSE: delete the prediction message first */
-                if(lastPredictionMsgId){
-                    const delId=lastPredictionMsgId;
-                    lastPredictionMsgId=null;
-                    enqueue(()=>deleteTelegramMessage(delId));
+            }, 1000);
+        }
+        startClock();
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('nav-' + tabId).classList.add('active');
+        }
+
+        function toggleBot() {
+            let btn = document.getElementById('powerBtn');
+            if(isActive) {
+                isActive = false;
+                clearInterval(syncLoop);
+                updateLiveUI("Session Ended", "--", "#fff");
+                addLog("Bot Stopped!");
+                let stopMsg = "🛑 <b>RAO SAHAB SESSION ENDED</b> 🛑\n\nPredictions stopped. Calculate your profits and wait for the next VIP session!";
+                sendTgMessage(stopMsg);
+                btn.innerHTML = "▶️ START VIP";
+                btn.classList.remove('active-stop');
+            } else {
+                isActive = true;
+                wins = 0; losses = 0; updateStats();
+                lastProcessedPeriod = ""; pendingPrediction = null;
+                document.getElementById('sessionLog').innerHTML = "";
+                addLog("Bot Started! Syncing...");
+                let startMsg = "💠 <b>RAO SAHAB VIP DESTINATION STARTED</b> 💠\n\nSystem is ACTIVE. All members get ready and maintain funds! Let's conquer the market!";
+                sendTgMessage(startMsg);
+                syncLoop = setInterval(botLogicTick, 1500);
+                btn.innerHTML = "⏹️ STOP VIP";
+                btn.classList.add('active-stop');
+            }
+        }
+
+        function setServer(server) {
+            currentServer = server;
+            document.getElementById('btnAiPro').className = 'server-btn';
+            document.getElementById('btnPremium').className = 'server-btn';
+            if(server === 'AIPRO') document.getElementById('btnAiPro').classList.add('active', 'aipro');
+            if(server === 'PREMIUM') document.getElementById('btnPremium').classList.add('active', 'premium');
+            addLog(`Server switched to: ${server}`);
+        }
+
+        function updateStats() {
+            document.getElementById('winCount').innerText = wins;
+            document.getElementById('lossCount').innerText = losses;
+        }
+
+        function updateLiveUI(period, text, colorCode) {
+            document.getElementById('predPeriod').innerText = `Period: ${period}`;
+            document.getElementById('predValue').innerHTML = `<span style="color:${colorCode}">${text}</span>`;
+        }
+
+        function addLog(msg, type = "normal") {
+            const logBox = document.getElementById('sessionLog');
+            if(logBox.innerHTML.includes("Bot is offline")) logBox.innerHTML = "";
+            let cssClass = "log-entry";
+            if(type === "win") cssClass += " log-win";
+            if(type === "loss") cssClass += " log-loss";
+            let timeStr = new Date().toLocaleTimeString('en-IN', { hour12: false });
+            logBox.innerHTML = `<div class="${cssClass}">[${timeStr}] ${msg}</div>` + logBox.innerHTML;
+        }
+
+        function getTgData() { return { token: document.getElementById('botToken').value, chatId: document.getElementById('chatId').value }; }
+        async function sendTgMessage(text) {
+            const { token, chatId } = getTgData();
+            if(!token || !chatId) return;
+            try { await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`); } catch(e) {}
+        }
+        async function sendTgSticker(stickerId) {
+            const { token, chatId } = getTgData();
+            if(!token || !chatId) return;
+            try { await fetch(`https://api.telegram.org/bot${token}/sendSticker?chat_id=${chatId}&sticker=${stickerId}`); } catch(e) {}
+        }
+
+        // DETERMINISTIC NUMBER
+        function getBestNumber(dataList, isBig) {
+            let counts = {};
+            for(let i=0; i<Math.min(dataList.length, 20); i++){
+                let num = parseInt(dataList[i].number);
+                if (isBig && num >= 5) { counts[num] = (counts[num] || 0) + 1; }
+                else if (!isBig && num < 5) { counts[num] = (counts[num] || 0) + 1; }
+            }
+            let bestNum = isBig ? 7 : 2; 
+            let maxCount = -1;
+            for(let key in counts) {
+                if(counts[key] > maxCount) { maxCount = counts[key]; bestNum = parseInt(key); }
+            }
+            return bestNum;
+        }
+
+        // ZERO-RANDOMNESS ENHANCED PATTERN ENGINE
+        function raoPremiumCalculation(dataList, targetPeriod) {
+            let historyStr = "";
+            let maxLen = Math.min(dataList.length, 100); 
+            for (let i = maxLen - 1; i >= 0; i--) { historyStr += (dataList[i].number >= 5) ? 'B' : 'A'; }
+            let total = historyStr.length;
+            
+            // Fallback determinism
+            if(total < 3) return { isBig: (BigInt(targetPeriod) % 2n === 0n), conf: 85, no: 7 };
+
+            let countA = historyStr.split('A').length - 1; let countB = historyStr.split('B').length - 1;
+            let freqA = countA / total; let freqB = countB / total;
+
+            let streak = 1;
+            for (let i = total - 1; i > 0; i--) { if (historyStr.charAt(i) === historyStr.charAt(i - 1)) streak++; else break; }
+            let lastChar = historyStr.charAt(total - 1);
+            let streakA = 0, streakB = 0;
+            if (streak >= 3) { if (lastChar === 'A') streakA = 1.0; else streakB = 1.0; }
+
+            let aToB = 0, aToA = 0, bToA = 0, bToB = 0;
+            for (let i = 0; i < total - 1; i++) {
+                let curr = historyStr.charAt(i); let next = historyStr.charAt(i + 1);
+                if (curr === 'A' && next === 'B') aToB++; if (curr === 'A' && next === 'A') aToA++;
+                if (curr === 'B' && next === 'A') bToA++; if (curr === 'B' && next === 'B') bToB++;
+            }
+            let transA = 0, transB = 0;
+            if (lastChar === 'A') { transA = (aToA >= aToB) ? 1.0 : 0; transB = (aToB > aToA) ? 1.0 : 0; }
+            if (lastChar === 'B') { transA = (bToA >= bToB) ? 1.0 : 0; transB = (bToB > bToA) ? 1.0 : 0; }
+
+            let altBreakA = 0, altBreakB = 0; let last4 = historyStr.slice(-4); let last3 = historyStr.slice(-3);
+            if (last3 === "ABA") altBreakA = 1.0; else if (last3 === "BAB") altBreakB = 1.0; 
+
+            let finalA = (freqA * 0.30) + (streakA * 0.25) + (transA * 0.25) + (altBreakA * 0.20);
+            let finalB = (freqB * 0.30) + (streakB * 0.25) + (transB * 0.25) + (altBreakB * 0.20);
+
+            // HARD OVERRIDES (Reduces Losses)
+            if (last4 === "BBBB") finalB += 2.0; // Follow the Dragon
+            if (last4 === "AAAA") finalA += 2.0; // Follow the Dragon
+            if (last4 === "AABB") finalA += 1.5; // Double Pair Mirror
+
+            let isBig = false;
+            if (finalB > finalA) isBig = true;
+            else if (finalA === finalB) isBig = (BigInt(targetPeriod) % 2n === 0n); // 100% Deterministic Tie-breaker
+
+            // Confidence calculation based on score difference
+            let diff = Math.abs(finalB - finalA);
+            let conf = 80 + Math.floor(diff * 10);
+            if(conf > 99) conf = 99;
+
+            let suggestedNo = getBestNumber(dataList, isBig);
+            return { isBig: isBig, conf: conf, no: suggestedNo };
+        }
+
+        // ZERO-RANDOMNESS AI PRO
+        function aiProCalculation(dataList, targetPeriod) {
+            let seq = dataList.slice(0, 1000).map(x => x.number >= 5 ? 'B' : 'S').reverse().join('');
+            if(seq.length < 5) return { isBig: (BigInt(targetPeriod) % 2n === 0n), conf: 85, no: 5 };
+            
+            let recent3 = seq.slice(-3); let countNextB = 0; let countNextS = 0;
+            for(let i = 0; i < seq.length - 3; i++) {
+                if(seq.substring(i, i+3) === recent3) { if(seq.charAt(i+3) === 'B') countNextB++; else countNextS++; }
+            }
+            
+            let isBig;
+            if(countNextB > countNextS) isBig = true;
+            else if(countNextS > countNextB) isBig = false;
+            else isBig = (BigInt(targetPeriod) % 2n === 0n); // Deterministic fallback
+            
+            let conf = 85 + (Math.abs(countNextB - countNextS) > 2 ? 10 : 0); 
+            if(conf > 99) conf = 99;
+            let suggestedNo = getBestNumber(dataList, isBig);
+            return { isBig: isBig, conf: conf, no: suggestedNo };
+        }
+
+        async function fetchApi() {
+            try {
+                let res = await fetch(apiUrl); let json = await res.json();
+                if(json && json.data && json.data.list) return json.data.list;
+            } catch (e) {}
+            return null;
+        }
+
+        async function botLogicTick() {
+            if (!isActive || isFetching) return;
+            isFetching = true; 
+            let data = await fetchApi();
+            if (!data) { isFetching = false; return; }
+
+            let latestPeriod = data[0].issueNumber; let latestNumber = data[0].number; let latestIsBig = latestNumber >= 5;
+
+            if (lastProcessedPeriod !== "" && latestPeriod !== lastProcessedPeriod) {
+                lastProcessedPeriod = latestPeriod;
+
+                if (pendingPrediction !== null && pendingPrediction.period === latestPeriod) {
+                    if (pendingPrediction.isBig === latestIsBig) {
+                        wins++; updateStats();
+                        addLog(`WON Period ${latestPeriod} (No: ${latestNumber})`, "win");
+                        
+                        await sendTgSticker(winFirstSticker);
+                        let midSticker = getDeterministicSticker(winMiddleStickers, latestPeriod + "1");
+                        await sendTgSticker(midSticker);
+                        let lastSticker = getDeterministicSticker(winLastStickers, latestPeriod + "2");
+                        await sendTgSticker(lastSticker);
+                    } else {
+                        losses++; updateStats();
+                        addLog(`LOST Period ${latestPeriod} (No: ${latestNumber})`, "loss");
+                        
+                        let lossSticker = getDeterministicSticker(lossStickers, latestPeriod);
+                        await sendTgSticker(lossSticker);
+                    }
+                }
+
+                let nextPeriod = (BigInt(latestPeriod) + 1n).toString();
+                let resultObj = (currentServer === 'PREMIUM') ? raoPremiumCalculation(data, nextPeriod) : aiProCalculation(data, nextPeriod);
+                pendingPrediction = { period: nextPeriod, isBig: resultObj.isBig };
+                
+                let typeStr = resultObj.isBig ? "BIG" : "SMALL";
+                let uiColorCode = resultObj.isBig ? "#ff3366" : "#00ffaa";
+                
+                let colorText = "";
+                if(document.getElementById('colorToggle').checked) {
+                    let color = (resultObj.no % 2 === 0) ? "🔴 Red" : "🟢 Green";
+                    if(resultObj.no === 0 || resultObj.no === 5) color = "🟣 Violet + " + (resultObj.no === 0 ? "🔴 Red" : "🟢 Green");
+                    colorText = `\n🌈 Color: ${color}`;
+                }
+
+                updateLiveUI(nextPeriod, typeStr, uiColorCode);
+
+                let vipMsg = `💠 <b>RAO SAHAB VIP SIGNAL</b> 💠\n\n🎯 Game: Wingo 30 sec \n🆔 Period: <b>${nextPeriod}</b>\n\n🔥 Prediction: <b>${typeStr}</b> ${colorText}\n📊 Confidence: ${resultObj.conf}%\n👑 Rao suggested no: ${resultObj.no} \n💎 Powered By: RAO SAHAB SYSTEM`;
+                await sendTgMessage(vipMsg);
+                addLog(`Signal Sent for ${nextPeriod}: ${typeStr}`);
+            } else if (lastProcessedPeriod === "") {
+                lastProcessedPeriod = latestPeriod;
+                addLog("Synced with Server. Ready for next cycle...");
+            }
+            isFetching = false;
+        }
+
+        // --- RETROACTIVE HISTORY (WIN/LOSS TRACKING) ---
+        async function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            const ballsContainer = document.getElementById('historyBalls');
+            
+            container.innerHTML = '<p style="text-align:center; color:#00e5ff;">Running Pattern Calculations...</p>';
+            ballsContainer.innerHTML = '';
+
+            let data = await fetchApi();
+            if(data) {
+                container.innerHTML = '';
+                
+                for(let i=0; i<Math.min(data.length, 15); i++) {
+                    let d = data[i];
+                    let isBig = d.number >= 5;
+                    let ballClass = isBig ? "ball-red" : "ball-green";
+                    ballsContainer.innerHTML += `<div class="ball ${ballClass}">${d.number}</div>`;
+                }
+
+                // Retroactive Calculation Loop
+                for(let i=0; i<Math.min(data.length - 1, 15); i++) {
+                    let actualData = data[i];
+                    let pastDataForCalculation = data.slice(i + 1); // Only data available BEFORE this period
+                    let targetPeriod = actualData.issueNumber;
+                    
+                    // Run the bot's logic on past data
+                    let botResult = (currentServer === 'PREMIUM') ? raoPremiumCalculation(pastDataForCalculation, targetPeriod) : aiProCalculation(pastDataForCalculation, targetPeriod);
+                    
+                    let actualIsBig = actualData.number >= 5;
+                    let botIsBig = botResult.isBig;
+                    let isWin = (actualIsBig === botIsBig);
+                    
+                    let t = actualIsBig ? '<span style="color:#ff3366; font-weight:bold;">🔴 BIG</span>' : '<span style="color:#00ffaa; font-weight:bold;">🟢 SMALL</span>';
+                    
+                    let badge = isWin ? '<span class="badge badge-win">✅ WIN</span>' : '<span class="badge badge-loss">❌ LOSS</span>';
+                    let botPredText = botIsBig ? "BIG" : "SMALL";
+                    
+                    container.innerHTML += `
+                    <div class="history-item" style="flex-direction:column; align-items:flex-start;">
+                        <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
+                            <span><b>${actualData.issueNumber}</b></span>
+                            ${badge}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; width:100%; color:#88ddff; font-size:12px;">
+                            <span>Bot Said: <b>${botPredText}</b></span>
+                            <span>Result: ${actualData.number} | ${t}</span>
+                        </div>
+                    </div>`;
                 }
             }
         }
-    }
-}
-
-function updateHistoryDisplay(){
-    const hl=document.getElementById('historyList');updateWinLossBadge();
-    let f=predictionHistory.filter(i=>i.gameType===currentGameTypeFilter);
-    if(winFilterActive)f=f.filter(i=>i.isWin);
-    if(!f.length){hl.innerHTML='<div class="no-history">No predictions match filters</div>';return;}
-    hl.innerHTML=f.map(i=>{const pN=i.predictedNumber!==undefined?' ('+i.predictedNumber+')':'';const hit=i.numMatch?'  🎯':'';return'<div class="history-item '+(i.isWin?'win':'lose')+'"><div class="history-left"><span class="history-period">'+i.period+' ('+i.gameType+')</span><span class="history-prediction">Predicted: '+i.prediction+pN+hit+'</span></div><div class="history-right"><span class="history-result">Result: '+i.actual+' ('+i.number+')</span><span class="history-status '+(i.isWin?'win':'lose')+'">'+(i.isWin?'WIN':'LOSE')+'</span></div></div>';}).join('');
-}
-
-function updatePrediction(data){
-    checkPreviousPrediction(data);
-    const res=advancedPredict(data);
-    document.getElementById('predictionText').textContent=res.prediction;
-    document.getElementById('predictionNum').textContent=res.number;
-    document.getElementById('predictionNum').className='prediction-num '+getNumColor(res.number);
-    document.getElementById('predictionConfidence').textContent='AI CONFIDENCE: '+res.confidence+'%';
-    const latestIssue=data[0].issueNumber;
-    currentPeriod=(BigInt(latestIssue)+1n).toString();
-    currentPrediction=res.prediction;currentPredictedNumber=res.number;currentConfidence=res.confidence;
-    document.getElementById('predictionText').classList.add('updated');document.getElementById('predictionNum').classList.add('updated');
-    setTimeout(()=>{document.getElementById('predictionText').classList.remove('updated');document.getElementById('predictionNum').classList.remove('updated');},450);
-    syncGauges();
-
-    /* TELEGRAM: queue prediction AFTER any win stickers or delete */
-    if(telegramBotActive&&currentPeriod!==telegramLastPeriod){
-        telegramLastPeriod=currentPeriod;
-        const p=currentPeriod,pr=res.prediction,n=res.number,c=res.confidence;
-        const photo=getPredictionPhoto(pr,is30Sec);
-        const caption=buildPredictionCaption(p,pr,n,c);
-        enqueue(async()=>{
-            try{
-                const result=await sendTelegramPhoto(photo,caption);
-                lastPredictionMsgId=result.result.message_id;
-                telegramTotalSent++;updateBotCard();
-            }catch(e){
-                try{
-                    const result=await sendTelegramMessage(caption);
-                    lastPredictionMsgId=result.result.message_id;
-                    telegramTotalSent++;updateBotCard();
-                }catch(e2){showTelegramStatus('error','⚠️ Send failed');}
-            }
-        });
-    }
-}
-
-function toggleGame(){
-    is30Sec=!is30Sec;currentPrediction=null;currentPeriod=null;currentPredictedNumber=null;
-    document.getElementById('starSymbol').classList.toggle('thirty-sec',is30Sec);
-    document.getElementById('timerDisplay').classList.toggle('thirty-sec',is30Sec);
-    document.getElementById('periodNumber').textContent='Loading...';
-    document.getElementById('periodNumber').classList.add('loading');
-    fetchData();updateISTTimer();if(navigator.vibrate)navigator.vibrate(5);
-}
-
-async function fetchData(){
-    const period=document.getElementById('periodNumber');const timer=document.getElementById('timerDisplay');
-    try{const r=await fetch(is30Sec?API_30S:API_1M);const d=await r.json();
-    if(d.code===0&&d.data.list.length>0){const next=(BigInt(d.data.list[0].issueNumber)+1n).toString();period.textContent=next;period.classList.remove('loading');period.classList.add('updated');setTimeout(()=>period.classList.remove('updated'),300);timer.classList.add('fetching');setTimeout(()=>timer.classList.remove('fetching'),300);updatePrediction(d.data.list);if(navigator.vibrate)navigator.vibrate([30,20,30]);}}catch(e){console.error(e);period.textContent='Error';}
-}
-
-function updateISTTimer(){
-    const timer=document.getElementById('timerDisplay');const now=new Date();
-    const ist=new Date(now.getTime()+5.5*3600000+now.getTimezoneOffset()*60000);const sec=ist.getSeconds();let rem;
-    if(is30Sec){rem=sec<30?30-sec:60-sec;if((sec===0||sec===30)&&lastFetchedSecond!==sec){lastFetchedSecond=sec;setTimeout(fetchData,300);}}
-    else{rem=60-sec;if(rem===60)rem=60;if(sec===0&&lastFetchedSecond!==sec){lastFetchedSecond=sec;setTimeout(fetchData,300);}}
-    if(sec!==0&&sec!==30)lastFetchedSecond=-1;timer.textContent=rem;
-}
-fetchData();setInterval(updateISTTimer,1000);updateISTTimer();
-
-function switchTab(el){
-    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');
-    document.getElementById('pageTitleText').textContent=el.getAttribute('data-title');
-    document.getElementById('pageTitleIcon').innerHTML=icons[el.getAttribute('data-icon')];
-    document.querySelectorAll('.page-content').forEach(p=>p.classList.remove('active'));
-    document.getElementById(el.getAttribute('data-page')).classList.add('active');
-    if(el.getAttribute('data-page')==='historyPage'){setGameTypeFilter('30S');if(winFilterActive)toggleWinFilter();updateHistoryDisplay();}
-    const nav=document.getElementById('bottomNav'),container=document.getElementById('rippleContainer');
-    const nR=nav.getBoundingClientRect(),eR=el.getBoundingClientRect();
-    const rp=document.createElement('div');rp.className='water-ripple';rp.style.width='80px';rp.style.height='80px';
-    rp.style.left=(eR.left-nR.left+eR.width/2-40)+'px';rp.style.top=(eR.top-nR.top+eR.height/2-40)+'px';
-    container.appendChild(rp);setTimeout(()=>rp.remove(),800);
-    for(let i=0;i<3;i++){setTimeout(()=>{const b=document.createElement('div');b.className='bubble';const s=Math.random()*6+3;b.style.width=s+'px';b.style.height=s+'px';b.style.left=(eR.left-nR.left+eR.width/2+(Math.random()-.5)*20)+'px';b.style.top=(eR.top-nR.top+eR.height/2)+'px';nav.appendChild(b);requestAnimationFrame(()=>b.classList.add('pop'));setTimeout(()=>b.remove(),900);},i*60);}
-    if(navigator.vibrate)navigator.vibrate(8);
-}
-
-/* ══════════════════════════════════════════════════════
-   TELEGRAM API
-   ══════════════════════════════════════════════════════ */
-
-function showTelegramStatus(type,msg){const el=document.getElementById('telegramStatus');el.className='telegram-status '+type;el.textContent=msg;}
-function selectPreset(el,val){document.querySelectorAll('.win-preset').forEach(p=>p.classList.remove('selected'));el.classList.add('selected');document.getElementById('winCountInput').value=val;}
-function clearPresetSelection(){document.querySelectorAll('.win-preset').forEach(p=>p.classList.remove('selected'));}
-function openWinModal(){document.getElementById('winModal').classList.add('show');document.getElementById('winCountInput').value='';document.querySelectorAll('.win-preset').forEach(p=>p.classList.remove('selected'));}
-function closeWinModal(){document.getElementById('winModal').classList.remove('show');}
-
-async function sendTelegramMessage(text){
-    const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,text:text,disable_web_page_preview:false})});
-    const data=await res.json();if(!data.ok)throw new Error(data.description||'Send failed');return data;
-}
-async function sendTelegramPhoto(photoUrl,caption){
-    const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/sendPhoto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,photo:photoUrl,caption:caption||''})});
-    const data=await res.json();if(!data.ok)throw new Error(data.description||'Photo failed');return data;
-}
-async function sendTelegramSticker(stickerId){
-    const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/sendSticker',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,sticker:stickerId})});
-    const data=await res.json();if(!data.ok)throw new Error(data.description||'Sticker failed');return data;
-}
-async function deleteTelegramMessage(msgId){
-    try{
-        const res=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/deleteMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:telegramChannelId,message_id:msgId})});
-        await res.json();
-    }catch(e){console.error('Delete err:',e);}
-}
-
-function updateBotCard(){
-    document.getElementById('botTotalSent').textContent=telegramTotalSent;
-    document.getElementById('botWinCount').textContent=telegramCurrentWins;
-    document.getElementById('botTargetWin').textContent=telegramTargetWins;
-}
-
-window.handleStartClick=function(){
-    const botToken=document.getElementById('botToken').value.trim();
-    const channelId=document.getElementById('channelId').value.trim();
-    if(!botToken||!channelId){showTelegramStatus('error','❌ Please enter both Bot Token and Channel ID');return;}
-    if(telegramBotActive){showTelegramStatus('info','ℹ️ Bot already running. Stop first.');return;}
-    telegramBotToken=botToken;telegramChannelId=channelId;
-    openWinModal();
-};
-
-window.confirmAndStart=async function(){
-    const winInput=document.getElementById('winCountInput').value.trim();
-    const targetWins=parseInt(winInput);
-    if(!targetWins||targetWins<1){document.getElementById('winCountInput').style.borderColor='#ef4444';setTimeout(()=>document.getElementById('winCountInput').style.borderColor='#e0e0e0',1500);return;}
-    closeWinModal();
-    telegramTargetWins=targetWins;telegramCurrentWins=0;telegramTotalSent=0;
-    telegramLastPeriod=null;originalStickerIndex=0;lastPredictionMsgId=null;
-    sessionStartTime=Date.now();
-    msgQueue=[];queueRunning=false;
-
-    showTelegramStatus('info','⏳ Verifying bot token...');
-    try{const vr=await fetch('https://api.telegram.org/bot'+telegramBotToken+'/getMe');const vd=await vr.json();if(!vd.ok){showTelegramStatus('error','❌ Invalid Bot Token!');return;}}
-    catch(e){showTelegramStatus('error','❌ Network error.');return;}
-
-    showTelegramStatus('info','⏳ Starting session...');
-    telegramBotActive=true;
-    document.getElementById('startBotBtn').disabled=true;
-    document.getElementById('startBotBtn').textContent='● BOT RUNNING';
-    document.getElementById('botRunningCard').classList.add('show');
-    updateBotCard();
-
-    const istTime=getISTTimeString();
-    const caption='🚀 SESSION STARTED\n🎯 Target: '+targetWins+' Wins\n⏰ Time: '+istTime+'\n▰▰▰ ᴘᴏᴡᴇʀᴅ ʙʏ ᴀᴋᴇʟᴀ ʜᴀᴄᴋᴇʀ ▰▰▰';
-
-    /* QUEUE: session photo → session sticker → first prediction */
-    enqueue(async()=>{
-        try{await sendTelegramPhoto(PHOTO_URLS.SESSION_START,caption);}
-        catch(e){try{await sendTelegramMessage(caption);}catch(e2){showTelegramStatus('error','❌ Cannot send to channel.');telegramBotActive=false;document.getElementById('startBotBtn').disabled=false;document.getElementById('startBotBtn').textContent='▶ START BOT';document.getElementById('botRunningCard').classList.remove('show');return;}}
-    });
-    enqueue(()=>sendTelegramSticker(STICKER_IDS.SESSION_START));
-
-    if(currentPrediction&&currentPeriod){
-        telegramLastPeriod=currentPeriod;
-        const p=currentPeriod,pr=currentPrediction,n=currentPredictedNumber,c=currentConfidence;
-        const photo=getPredictionPhoto(pr,is30Sec);
-        const cap=buildPredictionCaption(p,pr,n,c);
-        enqueue(async()=>{
-            try{const result=await sendTelegramPhoto(photo,cap);lastPredictionMsgId=result.result.message_id;telegramTotalSent++;updateBotCard();}
-            catch(e){try{const result=await sendTelegramMessage(cap);lastPredictionMsgId=result.result.message_id;telegramTotalSent++;updateBotCard();}catch(e2){}}
-        });
-    }
-
-    showTelegramStatus('success','✅ Bot started! Sending predictions...');
-    if(navigator.vibrate)navigator.vibrate([50,30,50,30,100]);
-};
-
-/* ══════════ STOP BOT ══════════ */
-async function doStopBot(){
-    telegramBotActive=false;
-    const duration=Date.now()-sessionStartTime;
-    const durationStr=formatDuration(duration);
-    const endCaption='📊 SESSION COMPLETED\n✅ Wins: '+telegramCurrentWins+'/'+telegramTargetWins+'\n⏰ Duration: '+durationStr+'\n▰▰▰ ᴘᴏᴡᴇʀᴅ ʙʏ ᴀᴋᴇʟᴀ ᴛʀᴀᴅᴇʀ ▰▰▰';
-
-    /* Session end: STICKER first → then PHOTO */
-    try{await sendTelegramSticker(STICKER_IDS.SESSION_END);}catch(e){}
-    await sleep(100);
-    try{await sendTelegramPhoto(PHOTO_URLS.SESSION_END,endCaption);}catch(e){try{await sendTelegramMessage(endCaption);}catch(e2){}}
-
-    document.getElementById('startBotBtn').disabled=false;
-    document.getElementById('startBotBtn').textContent='▶ START BOT';
-    document.getElementById('botRunningCard').classList.remove('show');
-    showTelegramStatus('success','🛑 Bot stopped. Wins: '+telegramCurrentWins+'/'+telegramTargetWins);
-    if(navigator.vibrate)navigator.vibrate([100,50,200]);
-}
-
-window.stopTelegramBot=function(){
-    msgQueue=[];queueRunning=false;
-    enqueue(()=>doStopBot());
-};
-</script>
+    </script>
 </body>
-    </html>
+</html>
