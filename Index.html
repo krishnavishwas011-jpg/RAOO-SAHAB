@@ -1,510 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rao Sahab VIP Bot</title>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #050505; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 10px; overflow: hidden; }
-        
-        .app-container { background: rgba(5, 10, 20, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(0, 229, 255, 0.4); box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); border-radius: 20px; width: 100%; max-width: 420px; height: 95vh; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        
-        .header { text-align: center; padding: 20px 10px; border-bottom: 1px solid rgba(0, 229, 255, 0.2); box-shadow: 0 5px 15px rgba(0, 229, 255, 0.05); background: linear-gradient(180deg, rgba(0,229,255,0.1) 0%, transparent 100%); }
-        .main-title { font-family: 'Black Ops One', cursive; font-size: 28px; color: #00e5ff; text-shadow: 0 0 15px #00e5ff, 0 0 30px rgba(0,229,255,0.8); letter-spacing: 2px; margin: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum Analyzer - Auth</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        .content-area { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; }
-        .screen { display: none; animation: fadeIn 0.3s ease-in; }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 30%, #1a0b36 0%, #0d051d 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      padding: 20px;
+    }
 
-        .stats-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
-        .stat { background: #001a22; padding: 8px 15px; border-radius: 8px; border: 1px dashed #00e5ff; font-weight: bold; font-size: 15px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); }
-        .win-txt { color: #00ffaa; text-shadow: 0 0 5px #00ffaa; }
-        .loss-txt { color: #ff3366; text-shadow: 0 0 5px #ff3366; }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 50px rgba(139, 92, 246, 0.1);
+      backdrop-filter: blur(10px);
+    }
 
-        .live-pred-box { background: rgba(0, 229, 255, 0.05); border: 2px solid #00e5ff; border-radius: 12px; padding: 20px 10px; text-align: center; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0, 229, 255, 0.15); position: relative; }
-        .live-clock { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #00e5ff; text-shadow: 0 0 15px #00e5ff; margin-bottom: 10px; }
-        .live-pred-title { color: #88ddff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; }
-        .live-pred-value { font-size: 42px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.8); text-transform: uppercase; line-height: 1.1; }
+    .logo-area {
+      margin-bottom: 30px;
+    }
 
-        .section-title { color: #88ddff; font-size: 13px; margin-bottom: 8px; margin-top: 10px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid rgba(0,229,255,0.3); padding-bottom: 5px;}
-        
-        .input-group { margin-bottom: 15px; }
-        label { color: #00e5ff; font-size: 12px; font-weight: bold; margin-bottom: 5px; display: block; }
-        input[type="text"] { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid #00e5ff; color: #fff; border-radius: 8px; outline: none; transition: 0.3s; }
-        input[type="text"]:focus { box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); }
+    .logo-icon {
+      font-size: 50px;
+      color: #a78bfa;
+      text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+      animation: float 3s ease-in-out infinite;
+    }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-        button { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; background: #001a22; color: #00e5ff; border: 1px solid #00e5ff; font-size: 14px; }
-        button:hover { background: #00e5ff; color: #000; box-shadow: 0 0 15px #00e5ff; }
-        
-        .power-btn { width: 100%; padding: 15px; font-size: 16px; border-radius: 10px; color: #00ffaa; border: 2px solid #00ffaa; background: rgba(0, 255, 170, 0.1); font-weight: 900; letter-spacing: 1px; margin-bottom: 15px; }
-        .power-btn:hover { background: #00ffaa; color: #000; box-shadow: 0 0 20px #00ffaa; }
-        .power-btn.active-stop { color: #ff3366; border-color: #ff3366; background: rgba(255, 51, 102, 0.1); }
-        .power-btn.active-stop:hover { background: #ff3366; color: #fff; box-shadow: 0 0 20px #ff3366; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
 
-        .btn-full { grid-column: span 2; }
-        .btn-save { background: #00e5ff; color: #000; box-shadow: 0 0 10px #00e5ff; margin-top: 10px;}
+    .title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
 
-        .server-btn { background: #001a22; color: #aaa; border: 1px solid #335566; }
-        .server-btn.active.aipro { background: #8a2be2; color: #fff; border-color: #8a2be2; box-shadow: 0 0 20px #8a2be2; }
-        .server-btn.active.premium { background: #00e5ff; color: #000; border-color: #00e5ff; box-shadow: 0 0 20px #00e5ff; }
+    .subtitle {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 35px;
+      letter-spacing: 0.5px;
+    }
 
-        .toggle-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #001a22; padding: 12px; border-radius: 8px; border: 1px solid rgba(0,229,255,0.2); }
-        .toggle-label { color: #00e5ff; font-weight: bold; font-size: 13px;}
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #335566; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #00e5ff; box-shadow: 0 0 10px #00e5ff; }
-        input:checked + .slider:before { transform: translateX(20px); background-color: #000; }
+    /* Login State Styles */
+    .login-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: #fff;
+      color: #111827;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
 
-        .session-log { margin-top: 5px; padding: 10px; background: rgba(0,0,0,0.6); border: 1px dashed #00e5ff; border-radius: 8px; height: 110px; overflow-y: auto; font-size: 12px; line-height: 1.5; display: flex; flex-direction: column; gap: 6px; }
-        .log-entry { background: #001a22; padding: 6px 10px; border-left: 3px solid #00e5ff; border-radius: 4px; }
-        .log-win { border-color: #00ffaa; }
-        .log-loss { border-color: #ff3366; }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+      background: #f9fafb;
+    }
 
-        .ball-row { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; margin-bottom: 10px; border-bottom: 1px solid rgba(0,229,255,0.2); scrollbar-width: none; }
-        .ball-row::-webkit-scrollbar { display: none; }
-        .ball { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; color: #fff; box-shadow: 0 0 8px rgba(0,0,0,0.5); flex-shrink: 0; border: 2px solid rgba(255,255,255,0.2); }
-        .ball-red { background: linear-gradient(135deg, #ff3366, #cc0033); box-shadow: 0 0 10px #ff3366; }
-        .ball-green { background: linear-gradient(135deg, #00ffaa, #00cc88); color: #000; box-shadow: 0 0 10px #00ffaa; }
+    .login-btn i {
+      font-size: 18px;
+    }
 
-        .history-list { display: flex; flex-direction: column; gap: 8px; }
-        .history-item { background: #001a22; border-left: 4px solid #00e5ff; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
-        .badge { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; text-transform: uppercase; }
-        .badge-win { background: rgba(0, 255, 170, 0.2); color: #00ffaa; border: 1px solid #00ffaa; }
-        .badge-loss { background: rgba(255, 51, 102, 0.2); color: #ff3366; border: 1px solid #ff3366; }
+    /* Logged In State Styles */
+    .profile-card {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background: #000b11; border-top: 1px solid rgba(0, 229, 255, 0.3); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -5px 15px rgba(0, 229, 255, 0.1); z-index: 10;}
-        .nav-btn { background: transparent; border: none; color: #558899; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; padding: 5px; box-shadow: none; text-transform: none; }
-        .nav-btn:hover { background: transparent; color: #00e5ff; box-shadow: none; }
-        .nav-btn.active { color: #00e5ff; text-shadow: 0 0 10px #00e5ff; font-weight: bold; }
-        .nav-icon { font-size: 20px; }
-    </style>
+    .avatar-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #a78bfa;
+      border-bottom-color: #8b5cf6;
+      animation: rotate 3s linear infinite;
+    }
+
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    .user-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #0d051d;
+      position: relative;
+      z-index: 2;
+    }
+
+    .user-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .user-email {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 30px;
+    }
+
+    .logout-btn {
+      width: 100%;
+      padding: 12px 20px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .error-msg {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="header">
-            <h1 class="main-title">RAO SAHAB VIP</h1>
-        </div>
+  <div class="container">
+    <div class="logo-area">
+      <i class="fa-solid fa-atom logo-icon"></i>
+    </div>
+    <h1 class="title">QUANTUM ANALYZER</h1>
+    <p class="subtitle" id="statusText">Aapka account authorize karein</p>
 
-        <div class="content-area">
-            
-            <div id="mainScreen" class="screen active">
-                <div class="stats-bar">
-                    <div class="stat win-txt">🟢 TOTAL WIN: <span id="winCount">0</span></div>
-                    <div class="stat loss-txt">🔴 LOSS: <span id="lossCount">0</span></div>
-                </div>
-
-                <div class="live-pred-box">
-                    <div class="live-clock" id="liveTime">30s</div>
-                    <div class="live-pred-title" id="predPeriod">Waiting for Session...</div>
-                    <div class="live-pred-value" id="predValue">--</div>
-                </div>
-
-                <div class="section-title">Prediction Server</div>
-                <div class="btn-grid">
-                    <button id="btnAiPro" class="server-btn" onclick="setServer('AIPRO')">🟣 AI PRO</button>
-                    <button id="btnPremium" class="server-btn active premium" onclick="setServer('PREMIUM')">💠 RAO PREMIUM</button>
-                </div>
-
-                <button class="power-btn" id="powerBtn" onclick="toggleBot()">▶️ START VIP</button>
-
-                <div class="section-title">Live Session Log</div>
-                <div class="session-log" id="sessionLog">
-                    <div class="log-entry" style="text-align:center; color:#558899; border:none;">Bot is offline.</div>
-                </div>
-            </div>
-
-            <div id="settingsScreen" class="screen">
-                <div class="section-title">Telegram Configuration</div>
-                <div class="input-group">
-                    <label>Bot Token</label>
-                    <input type="text" id="botToken" placeholder="Enter Telegram Bot Token">
-                </div>
-                <div class="input-group">
-                    <label>Chat ID / Channel ID</label>
-                    <input type="text" id="chatId" placeholder="Enter Target Chat ID">
-                </div>
-                
-                <div class="section-title" style="margin-top: 20px;">Bot Preferences</div>
-                <div class="toggle-group">
-                    <span class="toggle-label">🎨 Send Color Prediction</span>
-                    <label class="switch">
-                        <input type="checkbox" id="colorToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <button class="btn-full btn-save" onclick="saveSettings()">💾 Save Settings</button>
-                <div id="saveMsg" style="color:#00ffaa; text-align:center; margin-top:10px; font-size:12px; display:none;">Settings Saved Successfully!</div>
-            </div>
-
-            <div id="historyScreen" class="screen">
-                <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Calculated Past Results</span>
-                    <button onclick="loadHistory()" style="padding: 5px 10px; font-size:10px; border-radius: 5px;">🔄 Refresh</button>
-                </div>
-                
-                <div class="ball-row" id="historyBalls">
-                    <p style="text-align:center; width:100%; color:#558899; font-size:12px; margin-top:10px;">Click Refresh to run algorithms.</p>
-                </div>
-
-                <div class="history-list" id="historyContainer"></div>
-            </div>
-
-        </div>
-
-        <div class="bottom-nav">
-            <button class="nav-btn active" id="nav-mainScreen" onclick="switchTab('mainScreen')">
-                <span class="nav-icon">🏠</span>
-                <span>Main</span>
-            </button>
-            <button class="nav-btn" id="nav-settingsScreen" onclick="switchTab('settingsScreen')">
-                <span class="nav-icon">⚙️</span>
-                <span>Settings</span>
-            </button>
-            <button class="nav-btn" id="nav-historyScreen" onclick="switchTab('historyScreen'); loadHistory();">
-                <span class="nav-icon">📜</span>
-                <span>History</span>
-            </button>
-        </div>
+    <!-- State 1: Sign-In View -->
+    <div id="loggedOutView">
+      <button class="login-btn" id="googleLoginBtn">
+        <i class="fa-brands fa-google" style="color: #4285F4;"></i>
+        Sign in with Google
+      </button>
     </div>
 
-    <script>
-        let isActive = false;
-        let isFetching = false;
-        let currentServer = 'PREMIUM';
-        let wins = 0; let losses = 0;
-        let lastProcessedPeriod = "";
-        let pendingPrediction = null; 
-        let syncLoop;
-        let clockLoop;
-        
-        const apiUrl = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json?pageSize=1000";
+    <!-- State 2: Active User View -->
+    <div id="loggedInView" class="profile-card">
+      <div class="avatar-wrapper">
+        <div class="avatar-ring"></div>
+        <img id="userAvatar" src="" alt="User Avatar" class="user-avatar" />
+      </div>
+      <div class="user-name" id="userName">--</div>
+      <div class="user-email" id="userEmail">--</div>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
 
-        document.getElementById('botToken').value = localStorage.getItem('raoToken') || "";
-        document.getElementById('chatId').value = localStorage.getItem('raoChatId') || "";
+    <!-- System Status/Errors -->
+    <div id="errorBox" class="error-msg hidden"></div>
+  </div>
 
-        function saveSettings() {
-            localStorage.setItem('raoToken', document.getElementById('botToken').value);
-            localStorage.setItem('raoChatId', document.getElementById('chatId').value);
-            let msg = document.getElementById('saveMsg');
-            msg.style.display = "block";
-            setTimeout(() => { msg.style.display = "none"; }, 3000);
-        }
+  <script type="module">
+    // Modern Firebase SDK Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithPopup, 
+      GoogleAuthProvider, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // COMPLETE STICKERS ARRAYS
-        const winFirstSticker = "CAACAgUAAxkBAAEQg65pkGLJ3sfc9IXFEvzrDZxtQULGxQACuxMAAtZgYVZaFxCncOnSvjoE";
-        const winMiddleStickers = ["CAACAgUAAxkBAAEQlKRpmc6YKoTbG9mtawI1wwABuQcxkfQAAkoTAAKLKmFWDJoBh856d0Y6BA", "CAACAgUAAxkBAAEQlKZpmc6aK74AAdmQTU5pzHvRwaqw7kYAAhcNAAKnzeBWXQtoMocETe06BA", "CAACAgUAAxkBAAEQg7JpkGLRYnEJuXVf4IyE75RaVzuv7AACFxYAAl_PYFYjutVlOf2UrToE", "CAACAgUAAxkBAAEQg7ppkGLqX73S-rW9xnkTZqPyvouhKAACthgAAuLVYVazlUtOmfyVVToE", "CAACAgQAAxkBAAEQlLRpmc70FulL3-eJzdVKbpptjkaPMgACSRoAAgNU2VHZlzKhaQbrezoE", "CAACAgQAAxkBAAEQlLZpmc76iKOhV0or8IE9TSO0FhaYCQACKxMAAtLVMFNhNXRNB2za4DoE", "CAACAgQAAxkBAAEQlLhpmc8DgRaIES1Z4biLe6i0lcRGmwACjhYAAhYOQFESDRipdlattjoE"];
-        const winLastStickers = ["CAACAgUAAxkBAAEQlK5pmc6yU2kj7DMmOHGDzzo82qxT1gAC1hMAAmp9YVbvJhOMbbSNmDoE", "CAACAgUAAxkBAAEQlKhpmc6etFnxDItnzJwhAWlPXg240gAC0xMAAtJlYVZ8CDYuQ-4m-DoE"];
-        const lossStickers = ["CAACAgUAAxkBAAEQlLJpmc6_OGO-OzS4pO4D6BxunLlM2QACcRQAAiWLYFaCAQAB8ZzOON86BA", "CAACAgUAAxkBAAEQlKJpmc6TGK5kA5LlPk4RmwWv2F-obgAC4BEAAsSNmVRK1rmkcLLTfDoE", "CAACAgQAAxkBAAEQg-5pkGWF-FAmdhNFkU8uV8gE9X3XRAAClB4AAvXaeVENfiCb3FU6WToE", "CAACAgUAAxkBAAEQlJ5pmc5_Kk87IB5RAAGl3SXrK_Zli7EAAjMPAAIyWnlX74RGpO7pE4A6BA"];
+    // Aapke dushre project ki configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-mE3n1d5Y77GY1-FbJ5WKpriP2LqW6HY",
+      authDomain: "quantum-anlyzer.firebaseapp.com",
+      databaseURL: "https://quantum-anlyzer-default-rtdb.firebaseio.com",
+      projectId: "quantum-anlyzer",
+      storageBucket: "quantum-anlyzer.firebasestorage.app",
+      messagingSenderId: "1066810347341",
+      appId: "1:1066810347341:web:f29a5ffe2175f0e6ca3104"
+    };
 
-        // 100% DETERMINISTIC STICKER PICKER (No Math.random)
-        function getDeterministicSticker(array, periodString) {
-            let num = BigInt(periodString);
-            let index = num % BigInt(array.length);
-            return array[Number(index)];
-        }
+    // Initialize Firebase aur Auth
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-        function startClock() {
-            clockLoop = setInterval(() => {
-                let currentSeconds = new Date().getSeconds();
-                let countdown = 30 - (currentSeconds % 30);
-                document.getElementById('liveTime').innerText = countdown + "s";
-                if(countdown <= 5) {
-                    document.getElementById('liveTime').style.color = "#ff3366";
-                    document.getElementById('liveTime').style.textShadow = "0 0 15px #ff3366";
-                } else {
-                    document.getElementById('liveTime').style.color = "#00e5ff";
-                    document.getElementById('liveTime').style.textShadow = "0 0 15px #00e5ff";
-                }
-            }, 1000);
-        }
-        startClock();
+    // DOM Elements
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loggedOutView = document.getElementById("loggedOutView");
+    const loggedInView = document.getElementById("loggedInView");
+    const userAvatar = document.getElementById("userAvatar");
+    const userName = document.getElementById("userName");
+    const userEmail = document.getElementById("userEmail");
+    const statusText = document.getElementById("statusText");
+    const errorBox = document.getElementById("errorBox");
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('nav-' + tabId).classList.add('active');
-        }
+    // UI State switch function
+    function updateUI(user) {
+      errorBox.classList.add("hidden");
+      if (user) {
+        // Logged In
+        loggedOutView.classList.add("hidden");
+        loggedInView.style.display = "flex";
+        statusText.innerText = "ACCESS AUTHORIZED";
+        userName.innerText = user.displayName || "Quantum User";
+        userEmail.innerText = user.email || "";
+        userAvatar.src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+      } else {
+        // Logged Out
+        loggedInView.style.display = "none";
+        loggedOutView.classList.remove("hidden");
+        statusText.innerText = "Aapka account authorize karein";
+      }
+    }
 
-        function toggleBot() {
-            let btn = document.getElementById('powerBtn');
-            if(isActive) {
-                isActive = false;
-                clearInterval(syncLoop);
-                updateLiveUI("Session Ended", "--", "#fff");
-                addLog("Bot Stopped!");
-                let stopMsg = "🛑 <b>RAO SAHAB SESSION ENDED</b> 🛑\n\nPredictions stopped. Calculate your profits and wait for the next VIP session!";
-                sendTgMessage(stopMsg);
-                btn.innerHTML = "▶️ START VIP";
-                btn.classList.remove('active-stop');
-            } else {
-                isActive = true;
-                wins = 0; losses = 0; updateStats();
-                lastProcessedPeriod = ""; pendingPrediction = null;
-                document.getElementById('sessionLog').innerHTML = "";
-                addLog("Bot Started! Syncing...");
-                let startMsg = "💠 <b>RAO SAHAB VIP DESTINATION STARTED</b> 💠\n\nSystem is ACTIVE. All members get ready and maintain funds! Let's conquer the market!";
-                sendTgMessage(startMsg);
-                syncLoop = setInterval(botLogicTick, 1500);
-                btn.innerHTML = "⏹️ STOP VIP";
-                btn.classList.add('active-stop');
-            }
-        }
+    // Google Sign-In Event Listener
+    googleLoginBtn.addEventListener("click", async () => {
+      errorBox.classList.add("hidden");
+      try {
+        const result = await signInWithPopup(auth, provider);
+        // User parameters update automatically via Auth State Listener below
+      } catch (error) {
+        console.error("Login Error:", error);
+        errorBox.classList.remove("hidden");
+        errorBox.innerText = error.message || "Login fail ho gaya. Kripya check karein.";
+      }
+    });
 
-        function setServer(server) {
-            currentServer = server;
-            document.getElementById('btnAiPro').className = 'server-btn';
-            document.getElementById('btnPremium').className = 'server-btn';
-            if(server === 'AIPRO') document.getElementById('btnAiPro').classList.add('active', 'aipro');
-            if(server === 'PREMIUM') document.getElementById('btnPremium').classList.add('active', 'premium');
-            addLog(`Server switched to: ${server}`);
-        }
+    // Logout Event Listener
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("Logout Error:", error);
+      }
+    });
 
-        function updateStats() {
-            document.getElementById('winCount').innerText = wins;
-            document.getElementById('lossCount').innerText = losses;
-        }
-
-        function updateLiveUI(period, text, colorCode) {
-            document.getElementById('predPeriod').innerText = `Period: ${period}`;
-            document.getElementById('predValue').innerHTML = `<span style="color:${colorCode}">${text}</span>`;
-        }
-
-        function addLog(msg, type = "normal") {
-            const logBox = document.getElementById('sessionLog');
-            if(logBox.innerHTML.includes("Bot is offline")) logBox.innerHTML = "";
-            let cssClass = "log-entry";
-            if(type === "win") cssClass += " log-win";
-            if(type === "loss") cssClass += " log-loss";
-            let timeStr = new Date().toLocaleTimeString('en-IN', { hour12: false });
-            logBox.innerHTML = `<div class="${cssClass}">[${timeStr}] ${msg}</div>` + logBox.innerHTML;
-        }
-
-        function getTgData() { return { token: document.getElementById('botToken').value, chatId: document.getElementById('chatId').value }; }
-        async function sendTgMessage(text) {
-            const { token, chatId } = getTgData();
-            if(!token || !chatId) return;
-            try { await fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`); } catch(e) {}
-        }
-        async function sendTgSticker(stickerId) {
-            const { token, chatId } = getTgData();
-            if(!token || !chatId) return;
-            try { await fetch(`https://api.telegram.org/bot${token}/sendSticker?chat_id=${chatId}&sticker=${stickerId}`); } catch(e) {}
-        }
-
-        // DETERMINISTIC NUMBER
-        function getBestNumber(dataList, isBig) {
-            let counts = {};
-            for(let i=0; i<Math.min(dataList.length, 20); i++){
-                let num = parseInt(dataList[i].number);
-                if (isBig && num >= 5) { counts[num] = (counts[num] || 0) + 1; }
-                else if (!isBig && num < 5) { counts[num] = (counts[num] || 0) + 1; }
-            }
-            let bestNum = isBig ? 7 : 2; 
-            let maxCount = -1;
-            for(let key in counts) {
-                if(counts[key] > maxCount) { maxCount = counts[key]; bestNum = parseInt(key); }
-            }
-            return bestNum;
-        }
-
-        // ZERO-RANDOMNESS ENHANCED PATTERN ENGINE
-        function raoPremiumCalculation(dataList, targetPeriod) {
-            let historyStr = "";
-            let maxLen = Math.min(dataList.length, 100); 
-            for (let i = maxLen - 1; i >= 0; i--) { historyStr += (dataList[i].number >= 5) ? 'B' : 'A'; }
-            let total = historyStr.length;
-            
-            // Fallback determinism
-            if(total < 3) return { isBig: (BigInt(targetPeriod) % 2n === 0n), conf: 85, no: 7 };
-
-            let countA = historyStr.split('A').length - 1; let countB = historyStr.split('B').length - 1;
-            let freqA = countA / total; let freqB = countB / total;
-
-            let streak = 1;
-            for (let i = total - 1; i > 0; i--) { if (historyStr.charAt(i) === historyStr.charAt(i - 1)) streak++; else break; }
-            let lastChar = historyStr.charAt(total - 1);
-            let streakA = 0, streakB = 0;
-            if (streak >= 3) { if (lastChar === 'A') streakA = 1.0; else streakB = 1.0; }
-
-            let aToB = 0, aToA = 0, bToA = 0, bToB = 0;
-            for (let i = 0; i < total - 1; i++) {
-                let curr = historyStr.charAt(i); let next = historyStr.charAt(i + 1);
-                if (curr === 'A' && next === 'B') aToB++; if (curr === 'A' && next === 'A') aToA++;
-                if (curr === 'B' && next === 'A') bToA++; if (curr === 'B' && next === 'B') bToB++;
-            }
-            let transA = 0, transB = 0;
-            if (lastChar === 'A') { transA = (aToA >= aToB) ? 1.0 : 0; transB = (aToB > aToA) ? 1.0 : 0; }
-            if (lastChar === 'B') { transA = (bToA >= bToB) ? 1.0 : 0; transB = (bToB > bToA) ? 1.0 : 0; }
-
-            let altBreakA = 0, altBreakB = 0; let last4 = historyStr.slice(-4); let last3 = historyStr.slice(-3);
-            if (last3 === "ABA") altBreakA = 1.0; else if (last3 === "BAB") altBreakB = 1.0; 
-
-            let finalA = (freqA * 0.30) + (streakA * 0.25) + (transA * 0.25) + (altBreakA * 0.20);
-            let finalB = (freqB * 0.30) + (streakB * 0.25) + (transB * 0.25) + (altBreakB * 0.20);
-
-            // HARD OVERRIDES (Reduces Losses)
-            if (last4 === "BBBB") finalB += 2.0; // Follow the Dragon
-            if (last4 === "AAAA") finalA += 2.0; // Follow the Dragon
-            if (last4 === "AABB") finalA += 1.5; // Double Pair Mirror
-
-            let isBig = false;
-            if (finalB > finalA) isBig = true;
-            else if (finalA === finalB) isBig = (BigInt(targetPeriod) % 2n === 0n); // 100% Deterministic Tie-breaker
-
-            // Confidence calculation based on score difference
-            let diff = Math.abs(finalB - finalA);
-            let conf = 80 + Math.floor(diff * 10);
-            if(conf > 99) conf = 99;
-
-            let suggestedNo = getBestNumber(dataList, isBig);
-            return { isBig: isBig, conf: conf, no: suggestedNo };
-        }
-
-        // ZERO-RANDOMNESS AI PRO
-        function aiProCalculation(dataList, targetPeriod) {
-            let seq = dataList.slice(0, 1000).map(x => x.number >= 5 ? 'B' : 'S').reverse().join('');
-            if(seq.length < 5) return { isBig: (BigInt(targetPeriod) % 2n === 0n), conf: 85, no: 5 };
-            
-            let recent3 = seq.slice(-3); let countNextB = 0; let countNextS = 0;
-            for(let i = 0; i < seq.length - 3; i++) {
-                if(seq.substring(i, i+3) === recent3) { if(seq.charAt(i+3) === 'B') countNextB++; else countNextS++; }
-            }
-            
-            let isBig;
-            if(countNextB > countNextS) isBig = true;
-            else if(countNextS > countNextB) isBig = false;
-            else isBig = (BigInt(targetPeriod) % 2n === 0n); // Deterministic fallback
-            
-            let conf = 85 + (Math.abs(countNextB - countNextS) > 2 ? 10 : 0); 
-            if(conf > 99) conf = 99;
-            let suggestedNo = getBestNumber(dataList, isBig);
-            return { isBig: isBig, conf: conf, no: suggestedNo };
-        }
-
-        async function fetchApi() {
-            try {
-                let res = await fetch(apiUrl); let json = await res.json();
-                if(json && json.data && json.data.list) return json.data.list;
-            } catch (e) {}
-            return null;
-        }
-
-        async function botLogicTick() {
-            if (!isActive || isFetching) return;
-            isFetching = true; 
-            let data = await fetchApi();
-            if (!data) { isFetching = false; return; }
-
-            let latestPeriod = data[0].issueNumber; let latestNumber = data[0].number; let latestIsBig = latestNumber >= 5;
-
-            if (lastProcessedPeriod !== "" && latestPeriod !== lastProcessedPeriod) {
-                lastProcessedPeriod = latestPeriod;
-
-                if (pendingPrediction !== null && pendingPrediction.period === latestPeriod) {
-                    if (pendingPrediction.isBig === latestIsBig) {
-                        wins++; updateStats();
-                        addLog(`WON Period ${latestPeriod} (No: ${latestNumber})`, "win");
-                        
-                        await sendTgSticker(winFirstSticker);
-                        let midSticker = getDeterministicSticker(winMiddleStickers, latestPeriod + "1");
-                        await sendTgSticker(midSticker);
-                        let lastSticker = getDeterministicSticker(winLastStickers, latestPeriod + "2");
-                        await sendTgSticker(lastSticker);
-                    } else {
-                        losses++; updateStats();
-                        addLog(`LOST Period ${latestPeriod} (No: ${latestNumber})`, "loss");
-                        
-                        let lossSticker = getDeterministicSticker(lossStickers, latestPeriod);
-                        await sendTgSticker(lossSticker);
-                    }
-                }
-
-                let nextPeriod = (BigInt(latestPeriod) + 1n).toString();
-                let resultObj = (currentServer === 'PREMIUM') ? raoPremiumCalculation(data, nextPeriod) : aiProCalculation(data, nextPeriod);
-                pendingPrediction = { period: nextPeriod, isBig: resultObj.isBig };
-                
-                let typeStr = resultObj.isBig ? "BIG" : "SMALL";
-                let uiColorCode = resultObj.isBig ? "#ff3366" : "#00ffaa";
-                
-                let colorText = "";
-                if(document.getElementById('colorToggle').checked) {
-                    let color = (resultObj.no % 2 === 0) ? "🔴 Red" : "🟢 Green";
-                    if(resultObj.no === 0 || resultObj.no === 5) color = "🟣 Violet + " + (resultObj.no === 0 ? "🔴 Red" : "🟢 Green");
-                    colorText = `\n🌈 Color: ${color}`;
-                }
-
-                updateLiveUI(nextPeriod, typeStr, uiColorCode);
-
-                let vipMsg = `💠 <b>RAO SAHAB VIP SIGNAL</b> 💠\n\n🎯 Game: Wingo 30 sec \n🆔 Period: <b>${nextPeriod}</b>\n\n🔥 Prediction: <b>${typeStr}</b> ${colorText}\n📊 Confidence: ${resultObj.conf}%\n👑 Rao suggested no: ${resultObj.no} \n💎 Powered By: RAO SAHAB SYSTEM`;
-                await sendTgMessage(vipMsg);
-                addLog(`Signal Sent for ${nextPeriod}: ${typeStr}`);
-            } else if (lastProcessedPeriod === "") {
-                lastProcessedPeriod = latestPeriod;
-                addLog("Synced with Server. Ready for next cycle...");
-            }
-            isFetching = false;
-        }
-
-        // --- RETROACTIVE HISTORY (WIN/LOSS TRACKING) ---
-        async function loadHistory() {
-            const container = document.getElementById('historyContainer');
-            const ballsContainer = document.getElementById('historyBalls');
-            
-            container.innerHTML = '<p style="text-align:center; color:#00e5ff;">Running Pattern Calculations...</p>';
-            ballsContainer.innerHTML = '';
-
-            let data = await fetchApi();
-            if(data) {
-                container.innerHTML = '';
-                
-                for(let i=0; i<Math.min(data.length, 15); i++) {
-                    let d = data[i];
-                    let isBig = d.number >= 5;
-                    let ballClass = isBig ? "ball-red" : "ball-green";
-                    ballsContainer.innerHTML += `<div class="ball ${ballClass}">${d.number}</div>`;
-                }
-
-                // Retroactive Calculation Loop
-                for(let i=0; i<Math.min(data.length - 1, 15); i++) {
-                    let actualData = data[i];
-                    let pastDataForCalculation = data.slice(i + 1); // Only data available BEFORE this period
-                    let targetPeriod = actualData.issueNumber;
-                    
-                    // Run the bot's logic on past data
-                    let botResult = (currentServer === 'PREMIUM') ? raoPremiumCalculation(pastDataForCalculation, targetPeriod) : aiProCalculation(pastDataForCalculation, targetPeriod);
-                    
-                    let actualIsBig = actualData.number >= 5;
-                    let botIsBig = botResult.isBig;
-                    let isWin = (actualIsBig === botIsBig);
-                    
-                    let t = actualIsBig ? '<span style="color:#ff3366; font-weight:bold;">🔴 BIG</span>' : '<span style="color:#00ffaa; font-weight:bold;">🟢 SMALL</span>';
-                    
-                    let badge = isWin ? '<span class="badge badge-win">✅ WIN</span>' : '<span class="badge badge-loss">❌ LOSS</span>';
-                    let botPredText = botIsBig ? "BIG" : "SMALL";
-                    
-                    container.innerHTML += `
-                    <div class="history-item" style="flex-direction:column; align-items:flex-start;">
-                        <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:5px;">
-                            <span><b>${actualData.issueNumber}</b></span>
-                            ${badge}
-                        </div>
-                        <div style="display:flex; justify-content:space-between; width:100%; color:#88ddff; font-size:12px;">
-                            <span>Bot Said: <b>${botPredText}</b></span>
-                            <span>Result: ${actualData.number} | ${t}</span>
-                        </div>
-                    </div>`;
-                }
-            }
-        }
-    </script>
+    // Real-time Auth State Listener (Bina page refresh ke automatic state update karta hai)
+    onAuthStateChanged(auth, (user) => {
+      updateUI(user);
+    });
+  </script>
 </body>
 </html>
